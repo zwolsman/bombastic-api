@@ -1,4 +1,4 @@
-package com.zwolsman.bombasticapi
+package com.zwolsman.bombastic
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

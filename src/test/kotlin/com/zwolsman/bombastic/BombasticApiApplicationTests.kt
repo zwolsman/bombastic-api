@@ -1,4 +1,4 @@
-package com.zwolsman.bombasticapi
+package com.zwolsman.bombastic
 
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
