@@ -1,7 +1,7 @@
-package com.zwolsman.bombastic.controllers
+package com.zwolsman.bombastic.controllers.game
 
-import com.zwolsman.bombastic.controllers.response.GameDetailsResponse
-import com.zwolsman.bombastic.controllers.response.GameResponse
+import com.zwolsman.bombastic.controllers.game.response.GameDetailsResponse
+import com.zwolsman.bombastic.controllers.game.response.GameResponse
 import com.zwolsman.bombastic.services.GameService
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping

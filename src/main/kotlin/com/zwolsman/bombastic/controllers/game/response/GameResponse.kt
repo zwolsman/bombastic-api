@@ -1,4 +1,4 @@
-package com.zwolsman.bombastic.controllers.response
+package com.zwolsman.bombastic.controllers.game.response
 
 import com.zwolsman.bombastic.model.Game
 
