@@ -28,26 +28,36 @@ class GameController(private val gameService: GameService) {
 
     @GetMapping
     suspend fun games(): List<GameResponse> {
-        TODO()
+        return gameService
+            .allGames()
+            .map(::GameResponse)
     }
 
     @GetMapping("{id}")
     suspend fun game(@PathVariable id: String): GameResponse {
-        TODO()
+        return gameService
+            .byId(id)
+            .let(::GameResponse)
     }
 
     @PutMapping("{id}/guess")
     suspend fun guess(@PathVariable id: String, @RequestParam tileId: Int): GameResponse {
-        TODO()
+        return gameService
+            .guess(gameId = id, tileId)
+            .let(::GameResponse)
     }
 
     @PutMapping("{id}/cash-out")
     suspend fun cashOut(@PathVariable id: String): GameResponse {
-        TODO()
+        return gameService
+            .cashOut(gameId = id)
+            .let(::GameResponse)
     }
 
     @GetMapping("{id}/details")
     suspend fun gameDetails(@PathVariable id: String): GameDetailsResponse {
-        TODO()
+        return gameService
+            .byId(gameId = id)
+            .let(::GameDetailsResponse)
     }
 }

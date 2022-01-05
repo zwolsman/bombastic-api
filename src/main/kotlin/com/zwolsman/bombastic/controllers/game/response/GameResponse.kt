@@ -2,7 +2,7 @@ package com.zwolsman.bombastic.controllers.game.response
 
 import com.zwolsman.bombastic.model.Game
 
-open class GameResponse(
+class GameResponse(
     val id: String,
     val tiles: Map<Int, Tile>,
     val stake: Int,

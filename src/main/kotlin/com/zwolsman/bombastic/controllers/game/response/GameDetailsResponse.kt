@@ -3,15 +3,15 @@ package com.zwolsman.bombastic.controllers.game.response
 import com.zwolsman.bombastic.model.Game
 
 class GameDetailsResponse(
-    id: String,
-    tiles: Map<Int, Tile>,
-    stake: Int,
-    next: Int,
-    multiplier: Double,
-    colorId: Int,
-    state: State,
+    val id: String,
+    val tiles: Map<Int, GameResponse.Tile>,
+    val stake: Int,
+    val next: Int,
+    val multiplier: Double,
+    val colorId: Int,
+    val state: GameResponse.State,
     val secret: String,
     val plain: String?,
-) : GameResponse(id, tiles, stake, next, multiplier, colorId, state)
+)
 
 fun GameDetailsResponse(game: Game): GameDetailsResponse = TODO()
