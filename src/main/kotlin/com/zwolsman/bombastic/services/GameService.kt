@@ -16,7 +16,7 @@ class GameService(private val repo: GameRepository) {
         val model = GameModel(
             initialBet = initialBet,
             colorId = colorId,
-            bombs = GameLogic.generateBombs(amountOfBombs),
+            secret = GameLogic.generateSecret(amountOfBombs),
         )
 
         return repo

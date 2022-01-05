@@ -1,7 +1,7 @@
 package com.zwolsman.bombastic.db
 
-import com.zwolsman.bombastic.domain.converters.TileWritingConverter
 import com.zwolsman.bombastic.domain.Game
+import com.zwolsman.bombastic.domain.converters.TileWritingConverter
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Table
 data class GameModel(
     var initialBet: Int,
     var colorId: Int,
-    var bombs: List<Int>,
+    var secret: String,
 
     @Id
     var id: Long? = null,
@@ -22,7 +22,7 @@ fun GameModel(game: Game): GameModel {
         id = game.id,
         tiles = game.tiles.map(TileWritingConverter::convert),
         colorId = game.colorId,
-        bombs = game.bombs,
+        secret = game.secret,
         initialBet = game.initialBet,
         cashedOut = game.state == Game.State.CASHED_OUT
     )

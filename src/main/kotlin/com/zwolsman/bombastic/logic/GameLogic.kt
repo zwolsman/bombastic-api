@@ -47,8 +47,22 @@ object GameLogic {
         return floor(game.stake * odds).toInt() - game.stake
     }
 
-    fun generateBombs(amount: Int): List<Int> {
+    private const val alphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    fun generateSecret(amountOfBombs: Int): String {
+        val bombs = generateBombs(amountOfBombs).joinToString(separator = "-")
+        val str = generateRandomString(16)
 
+        return "$bombs-$str"
+    }
+
+    private fun generateRandomString(length: Long) =
+        rng
+            .ints(length, 0, alphanumeric.length)
+            .toArray()
+            .map(alphanumeric::get)
+            .joinToString(separator = "")
+
+    private fun generateBombs(amount: Int): List<Int> {
         require(amount in tileRange)
         require(amount < tileRange.last)
 

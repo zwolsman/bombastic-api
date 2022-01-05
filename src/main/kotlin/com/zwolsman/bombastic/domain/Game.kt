@@ -10,7 +10,7 @@ fun Game(model: GameModel): Game {
         id = model.id,
         tiles = tiles,
         initialBet = model.initialBet,
-        bombs = model.bombs,
+        secret = model.secret,
         colorId = model.colorId,
         state = when {
             model.cashedOut -> Game.State.CASHED_OUT
@@ -26,10 +26,12 @@ data class Game(
     val initialBet: Int,
     val colorId: Int,
     val state: State,
-    val bombs: List<Int>,
+    val secret: String,
 ) {
     val stake = initialBet + tiles.filterIsInstance<Points>().sumOf { it.amount }
     val next = GameLogic.calculateNext(this)
+    val bombs: List<Int>
+        get() = secret.split("-").dropLast(1).map(String::toInt)
 
     enum class State {
         IN_GAME,

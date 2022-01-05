@@ -39,7 +39,7 @@ CREATE TABLE games
     tiles       TEXT[],
     initial_bet INT,
     color_id    INT,
-    bombs       INT[],
-
+    secret      TEXT,
+    cashed_out  BOOL            DEFAULT FALSE,
     primary key (id)
 );
