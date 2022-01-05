@@ -10,7 +10,7 @@ internal class TileReadingConverterTest {
     fun readBomb() {
         val input = listOf("01BT", "16BF")
         val expected = listOf(Bomb(1, true), Bomb(16, false))
-        for((case, target) in input.zip(expected)) {
+        for ((case, target) in input.zip(expected)) {
             val result = TileReadingConverter.convert(case)
             require(result is Bomb)
             assert(result.id == target.id)
@@ -22,7 +22,7 @@ internal class TileReadingConverterTest {
     fun readPoints() {
         val input = listOf("01P100", "16P154671")
         val expected = listOf(Points(1, 100), Points(16, 154671))
-        for((case, target) in input.zip(expected)) {
+        for ((case, target) in input.zip(expected)) {
             val result = TileReadingConverter.convert(case)
             require(result is Points)
             assert(result.id == target.id)

@@ -7,5 +7,5 @@ import org.springframework.boot.runApplication
 class BombasticApiApplication
 
 fun main(args: Array<String>) {
-	runApplication<BombasticApiApplication>(*args)
+    runApplication<BombasticApiApplication>(*args)
 }

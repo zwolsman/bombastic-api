@@ -15,6 +15,5 @@ object TileReadingConverter : Converter<String, Tile> {
             'P' -> Points(id, amount = source.substring(startIndex = 3).toInt())
             else -> throw Exception("Invalid tile state")
         }
-
     }
 }
