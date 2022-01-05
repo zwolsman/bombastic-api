@@ -1,38 +1,32 @@
 package com.zwolsman.bombastic.converters
 
-import com.zwolsman.bombastic.model.Bomb
-import com.zwolsman.bombastic.model.Points
+import com.zwolsman.bombastic.domain.Bomb
+import com.zwolsman.bombastic.domain.Points
+import com.zwolsman.bombastic.domain.converters.TileReadingConverter
 import org.junit.jupiter.api.Test
 
 internal class TileReadingConverterTest {
-    private val converter = TileReadingConverter()
-
     @Test
     fun readBomb() {
         val input = listOf("01BT", "16BF")
-        val result = converter.convert(input)
-
-        assert(result.containsKey(1))
-        assert(result.containsKey(16))
-
-        val b1 = result[1] as Bomb
-        val b2 = result[16] as Bomb
-
-        assert(b1.revealedByUser == true)
-        assert(b2.revealedByUser == false)
+        val expected = listOf(Bomb(1, true), Bomb(16, false))
+        for((case, target) in input.zip(expected)) {
+            val result = TileReadingConverter.convert(case)
+            require(result is Bomb)
+            assert(result.id == target.id)
+            assert(result.revealedByUser == target.revealedByUser)
+        }
     }
 
     @Test
     fun readPoints() {
-        val input = listOf("01P100", "16P16543")
-        val result = converter.convert(input)
-
-        assert(result.containsKey(1))
-        assert(result.containsKey(16))
-        val p1 = result[1] as Points
-        val p2 = result[16] as Points
-
-        assert(p1.amount == 100)
-        assert(p2.amount == 16543)
+        val input = listOf("01P100", "16P154671")
+        val expected = listOf(Points(1, 100), Points(16, 154671))
+        for((case, target) in input.zip(expected)) {
+            val result = TileReadingConverter.convert(case)
+            require(result is Points)
+            assert(result.id == target.id)
+            assert(result.amount == target.amount)
+        }
     }
 }
