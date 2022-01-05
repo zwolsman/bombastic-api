@@ -33,7 +33,10 @@ object GameLogic {
     }
 
     fun cashOut(game: Game): Game {
-        TODO()
+        require(game.state == Game.State.IN_GAME) { "Game is already finished" }
+        return game.copy(
+            state = Game.State.CASHED_OUT
+        )
     }
 
     fun calculateNext(game: Game): Int {
