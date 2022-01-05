@@ -69,7 +69,7 @@ object GameLogic {
         return when (amount) {
             1 -> listOf(tileRange.random(rng))
             24 -> {
-                val openTile = rng.nextInt(25) + 1
+                val openTile = tileRange.random(rng)
                 tileRange.filter { it != openTile }
             }
             else -> {
