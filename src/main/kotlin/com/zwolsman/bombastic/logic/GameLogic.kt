@@ -1,7 +1,9 @@
 package com.zwolsman.bombastic.logic
 
+import com.zwolsman.bombastic.domain.Bomb
 import com.zwolsman.bombastic.domain.Game
 import com.zwolsman.bombastic.domain.Points
+import com.zwolsman.bombastic.domain.Tile
 import java.security.SecureRandom
 import kotlin.math.floor
 
@@ -11,8 +13,22 @@ object GameLogic {
     private const val stitching = 0.005
 
     fun guess(game: Game, tileId: Int): Game {
+        require(game.state == Game.State.IN_GAME) { "Game is already finished" }
+        require(tileId in tileRange) { "Tile should be in the game" }
+        require(tileId !in game.tiles.map(Tile::id)) { "Tile is already guessed" }
+
+        val didHitBomb = tileId in game.bombs
+        val result = if (didHitBomb)
+            game.bombs.map { Bomb(it, it == tileId) }
+        else
+            listOf(Points(tileId, game.next))
+
         return game.copy(
-            tiles = game.tiles + Points(tileId, game.next)
+            tiles = game.tiles + result,
+            state = if (didHitBomb)
+                Game.State.HIT_BOMB
+            else
+                Game.State.IN_GAME
         )
     }
 

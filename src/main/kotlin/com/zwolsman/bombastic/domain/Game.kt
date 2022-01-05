@@ -1,17 +1,22 @@
 package com.zwolsman.bombastic.domain
 
-import com.zwolsman.bombastic.domain.converters.TileReadingConverter
 import com.zwolsman.bombastic.db.GameModel
+import com.zwolsman.bombastic.domain.converters.TileReadingConverter
 import com.zwolsman.bombastic.logic.GameLogic
 
 fun Game(model: GameModel): Game {
+    val tiles = model.tiles.map(TileReadingConverter::convert)
     return Game(
         id = model.id,
-        tiles = model.tiles.map(TileReadingConverter::convert),
+        tiles = tiles,
         initialBet = model.initialBet,
         bombs = model.bombs,
         colorId = model.colorId,
-        state = Game.State.IN_GAME
+        state = when {
+            model.cashedOut -> Game.State.CASHED_OUT
+            tiles.any { it is Bomb } -> Game.State.HIT_BOMB
+            else -> Game.State.IN_GAME
+        }
     )
 }
 

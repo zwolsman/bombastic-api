@@ -6,6 +6,7 @@ import com.zwolsman.bombastic.services.GameService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -63,5 +64,11 @@ class GameController(private val gameService: GameService) {
         return gameService
             .byId(gameId = id)
             .let(::GameDetailsResponse)
+    }
+
+    @ExceptionHandler(IllegalArgumentException::class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    fun illegalArgument(ex: IllegalArgumentException): String {
+        return ex.message!!
     }
 }
