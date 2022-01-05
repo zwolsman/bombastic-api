@@ -62,27 +62,14 @@ object GameLogic {
             .map(alphanumeric::get)
             .joinToString(separator = "")
 
-    private fun generateBombs(amount: Int): List<Int> {
+    private fun generateBombs(amount: Int): Set<Int> {
         require(amount in tileRange)
         require(amount < tileRange.last)
 
-        return when (amount) {
-            1 -> listOf(tileRange.random(rng))
-            24 -> {
-                val openTile = tileRange.random(rng)
-                tileRange.filter { it != openTile }
-            }
-            else -> {
-                val bombs = mutableListOf<Int>()
-                while (bombs.size < amount) {
-                    val position = tileRange.random(rng)
-                    if (position !in bombs)
-                        bombs.add(position)
-                }
-
-                bombs
-            }
-        }
+        return generateSequence { tileRange.random(rng) }
+            .distinct()
+            .take(amount)
+            .toSet()
     }
 
     private fun IntRange.random(random: SecureRandom): Int {
