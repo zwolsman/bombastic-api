@@ -5,5 +5,5 @@ data class TokenResponse(
     val tokenType: String,
     val expiresIn: Int,
     val refreshToken: String,
-    val idToken: String
+    val idToken: String,
 )
