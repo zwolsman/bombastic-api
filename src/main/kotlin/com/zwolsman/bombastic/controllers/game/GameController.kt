@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/v1/games")
+@RequestMapping("/api/v1/games")
 class GameController(private val gameService: GameService) {
 
     @PostMapping

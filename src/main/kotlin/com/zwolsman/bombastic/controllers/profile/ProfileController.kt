@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-@RequestMapping("/v1/profile")
+@RequestMapping("/api/v1/profile")
 class ProfileController(private val appleIdService: AppleIdService) {
 
     @GetMapping
