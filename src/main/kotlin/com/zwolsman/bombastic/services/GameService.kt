@@ -12,8 +12,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class GameService(private val repo: GameRepository) {
-    suspend fun create(initialBet: Int, amountOfBombs: Int, colorId: Int): Game {
+    suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Game {
         val model = GameModel(
+            ownerId = owner,
             initialBet = initialBet,
             colorId = colorId,
             secret = GameLogic.generateSecret(amountOfBombs),
@@ -25,9 +26,9 @@ class GameService(private val repo: GameRepository) {
             .let(::Game)
     }
 
-    fun allGames(): Flow<Game> {
+    fun allGames(owner: String): Flow<Game> {
         return repo
-            .findAll()
+            .findAllByOwnerId(ownerId = owner)
             .map(::Game)
             .asFlow()
     }
@@ -37,8 +38,9 @@ class GameService(private val repo: GameRepository) {
         return model.let(::Game)
     }
 
-    suspend fun guess(gameId: String, tileId: Int): Game {
+    suspend fun guess(owner: String, gameId: String, tileId: Int): Game {
         val model = byId(gameId)
+            .requireOwner(owner)
             .let { GameLogic.guess(it, tileId) }
             .let(::GameModel)
 
@@ -48,8 +50,9 @@ class GameService(private val repo: GameRepository) {
             .let(::Game)
     }
 
-    suspend fun cashOut(gameId: String): Game {
+    suspend fun cashOut(owner: String, gameId: String): Game {
         val model = byId(gameId)
+            .requireOwner(owner)
             .let { GameLogic.cashOut(it) }
             .let(::GameModel)
 
@@ -58,6 +61,8 @@ class GameService(private val repo: GameRepository) {
             .awaitSingle()
             .let(::Game)
     }
+
+    private fun Game.requireOwner(ownerId: String) = apply { require(owner == ownerId) }
 }
 
 class GameNotFound(gameId: String) : Exception("Game not found with id '$gameId'")

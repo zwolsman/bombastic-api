@@ -8,6 +8,7 @@ fun Game(model: GameModel): Game {
     val tiles = model.tiles.map(TileReadingConverter::convert)
     return Game(
         id = model.id,
+        owner = model.ownerId,
         tiles = tiles,
         initialBet = model.initialBet,
         secret = model.secret,
@@ -22,6 +23,7 @@ fun Game(model: GameModel): Game {
 
 data class Game(
     val id: Long?,
+    val owner: String,
     val tiles: List<Tile>,
     val initialBet: Int,
     val colorId: Int,

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 
 @RestController
 @RequestMapping("/api/v1/games")
@@ -23,19 +24,12 @@ class GameController(private val gameService: GameService) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun create(@RequestBody payload: CreateGamePayload): GameResponse {
+    suspend fun create(@RequestBody payload: CreateGamePayload, principal: Principal): GameResponse {
         val (initialBet, bombs, colorId) = payload
 
         return gameService
-            .create(initialBet, bombs, colorId)
+            .create(owner = principal.name, initialBet, bombs, colorId)
             .let(::GameResponse)
-    }
-
-    @GetMapping
-    fun games(): Flow<GameResponse> {
-        return gameService
-            .allGames()
-            .map(::GameResponse)
     }
 
     @GetMapping("{id}")
@@ -45,25 +39,32 @@ class GameController(private val gameService: GameService) {
             .let(::GameResponse)
     }
 
-    @PutMapping("{id}/guess")
-    suspend fun guess(@PathVariable id: String, @RequestParam tileId: Int): GameResponse {
-        return gameService
-            .guess(gameId = id, tileId)
-            .let(::GameResponse)
-    }
-
-    @PutMapping("{id}/cash-out")
-    suspend fun cashOut(@PathVariable id: String): GameResponse {
-        return gameService
-            .cashOut(gameId = id)
-            .let(::GameResponse)
-    }
-
     @GetMapping("{id}/details")
     suspend fun gameDetails(@PathVariable id: String): GameDetailsResponse {
         return gameService
             .byId(gameId = id)
             .let(::GameDetailsResponse)
+    }
+
+    @GetMapping
+    fun games(principal: Principal): Flow<GameResponse> {
+        return gameService
+            .allGames(owner = principal.name)
+            .map(::GameResponse)
+    }
+
+    @PutMapping("{id}/guess")
+    suspend fun guess(@PathVariable id: String, @RequestParam tileId: Int, principal: Principal): GameResponse {
+        return gameService
+            .guess(owner = principal.name, gameId = id, tileId)
+            .let(::GameResponse)
+    }
+
+    @PutMapping("{id}/cash-out")
+    suspend fun cashOut(@PathVariable id: String, principal: Principal): GameResponse {
+        return gameService
+            .cashOut(owner = principal.name, gameId = id)
+            .let(::GameResponse)
     }
 
     @ExceptionHandler(IllegalArgumentException::class)

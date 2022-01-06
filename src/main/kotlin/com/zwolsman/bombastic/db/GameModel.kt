@@ -13,6 +13,7 @@ data class GameModel(
 
     @Id
     var id: Long? = null,
+    var ownerId: String,
     var tiles: List<String> = emptyList(),
     var cashedOut: Boolean = false,
 )
@@ -20,6 +21,7 @@ data class GameModel(
 fun GameModel(game: Game): GameModel {
     return GameModel(
         id = game.id,
+        ownerId = game.owner,
         tiles = game.tiles.map(TileWritingConverter::convert),
         colorId = game.colorId,
         secret = game.secret,

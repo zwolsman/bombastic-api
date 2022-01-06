@@ -36,10 +36,30 @@ ALTER FUNCTION public.id_generator() OWNER TO postgres;
 CREATE TABLE games
 (
     id          BIGINT not null DEFAULT id_generator(),
+    owner_id    TEXT   not null,
     tiles       TEXT[],
-    initial_bet INT,
-    color_id    INT,
-    secret      TEXT,
+    initial_bet INT    not null,
+    color_id    INT    not null,
+    secret      TEXT   not null,
     cashed_out  BOOL            DEFAULT FALSE,
     primary key (id)
 );
+
+CREATE TABLE profiles
+(
+    id                  SERIAL NOT NULL,
+    name                TEXT   NOT NULL,
+    email               TEXT   NOT NULL,
+    points              INT    NOT NULL DEFAULT 0,
+    games_played        INT    NOT NULL DEFAULT 0,
+    points_earned       INT    NOT NULL DEFAULT 0,
+    apple_user_id       TEXT            DEFAULT NULL,
+    apple_refresh_token TEXT            DEFAULT NULL,
+    apple_access_token  TEXT            DEFAULT NULL,
+    primary key (id)
+);
+
+CREATE UNIQUE INDEX unique_apple_user_id
+    ON profiles
+        (apple_user_id)
+    WHERE apple_user_id IS NOT NULL;
