@@ -46,7 +46,7 @@ class SecurityConfig(
             .securityContextRepository(securityContextRepository)
             .authorizeExchange()
             .pathMatchers(HttpMethod.OPTIONS).permitAll()
-            .pathMatchers("/api/v1/auth/sign-up").permitAll()
+            .pathMatchers("/api/v1/auth/sign-up", "/api/v1/auth/verify").permitAll()
             .pathMatchers("/api/**").authenticated()
             .anyExchange().permitAll()
             .and().build()

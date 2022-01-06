@@ -86,4 +86,12 @@ class AuthService(
     fun claims(token: String): JwtClaims {
         return jwtConsumer.processToClaims(token)
     }
+
+    suspend fun verify(authCode: String, identityToken: String): String {
+        val appleTokens = appleIdService.verify(identityToken, authCode)
+        val appleUserId = appleIdService.userId(appleTokens.idToken)
+        val profile = profileService.findByAppleUserId(appleUserId)
+
+        return createAccessToken(profile)
+    }
 }

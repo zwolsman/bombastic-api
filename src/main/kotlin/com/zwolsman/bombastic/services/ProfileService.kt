@@ -29,4 +29,8 @@ class ProfileService(private val repo: ProfileRepository) {
             .save(profile)
             .awaitSingle()
     }
+
+    suspend fun findByAppleUserId(appleUserId: String): ProfileModel {
+        return repo.findByAppleUserId(appleUserId).awaitSingle()
+    }
 }
