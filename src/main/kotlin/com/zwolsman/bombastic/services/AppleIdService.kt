@@ -1,6 +1,10 @@
 package com.zwolsman.bombastic.services
 
-import io.netty.handler.ssl.PemPrivateKey
+import com.zwolsman.bombastic.config.AppleIdConfiguration
+import com.zwolsman.bombastic.repositories.appleId.AppleIdRepository
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo
+import org.bouncycastle.openssl.PEMParser
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
 import org.jose4j.jwk.HttpsJwks
 import org.jose4j.jws.AlgorithmIdentifiers
 import org.jose4j.jws.JsonWebSignature
@@ -9,22 +13,17 @@ import org.jose4j.jwt.consumer.JwtConsumerBuilder
 import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import java.security.PrivateKey
 
 @Service
 class AppleIdService(
-    private val config: Configuration,
+    private val config: AppleIdConfiguration,
     @Value("classpath:apple/cert.p8")
-    private val resource: Resource
+    private val resource: Resource,
+    private val repo: AppleIdRepository,
 ) {
-
-    @ConfigurationProperties(prefix = "apple")
-    @ConstructorBinding
-    data class Configuration(val clientId: String, val teamId: String, val keyId: String)
 
     private val log = LoggerFactory.getLogger(javaClass)
 
@@ -36,7 +35,13 @@ class AppleIdService(
         .setExpectedAudience(config.clientId)
         .build()
 
-    private val privateKey: PrivateKey by lazy { PemPrivateKey.valueOf(resource.inputStream.readAllBytes()) }
+    private val privateKey: PrivateKey by lazy {
+        val parser = PEMParser(resource.inputStream.reader())
+        val converter = JcaPEMKeyConverter()
+        val info = parser.readObject() as PrivateKeyInfo
+        converter.getPrivateKey(info)
+    }
+
     private fun createSecret(): String {
         val jws = JsonWebSignature()
 
@@ -56,10 +61,11 @@ class AppleIdService(
         return jws.compactSerialization
     }
 
-    fun verify(identityToken: String, authCode: String): Boolean {
+    suspend fun verify(identityToken: String, authCode: String): Boolean {
         jwtConsumer.processToClaims(identityToken)
         val secret = createSecret()
-
+        val tokens = repo.validateCode(secret, authCode)
+        log.info(tokens.toString())
         return true
     }
 }

@@ -14,9 +14,9 @@ import java.util.Base64
 class ProfileController(private val appleIdService: AppleIdService) {
 
     @GetMapping
-    fun verify(@RequestHeader(HttpHeaders.AUTHORIZATION) authHeader: String, @RequestParam authCode: String) {
-        val (_, identityToken) = authHeader.split(" ")
-        Base64.getDecoder().decode(identityToken)
+    suspend fun verify(@RequestHeader(HttpHeaders.AUTHORIZATION) authHeader: String, @RequestParam authCode: String) {
+        val (_, base64Token) = authHeader.split(" ")
+        val identityToken = String(Base64.getDecoder().decode(base64Token))
         appleIdService.verify(identityToken, authCode)
     }
 }
