@@ -1,20 +1,30 @@
 package com.zwolsman.bombastic.controllers.profile
 
-import com.zwolsman.bombastic.services.AppleIdService
-import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.security.Principal
 
 @RestController
-@RequestMapping("/api/v1/profile")
-class ProfileController(private val appleIdService: AppleIdService) {
+@RequestMapping("/api/v1/profiles")
+class ProfileController {
 
-    @GetMapping
-    suspend fun verify(@RequestHeader(HttpHeaders.AUTHORIZATION) authHeader: String, @RequestParam authCode: String) {
-        val (_, identityToken) = authHeader.split(" ")
-        appleIdService.verify(identityToken, authCode)
+    @GetMapping("/me")
+    suspend fun userProfile(principal: Principal): SimpleProfile {
+        return SimpleProfile(principal.name, 1000, 0, 0, "link")
+    }
+
+    @GetMapping("/{id}")
+    fun byId(@PathVariable id: String): SimpleProfile {
+        return SimpleProfile(id, 1000, 0, 0, "link")
     }
 }
+
+data class SimpleProfile(
+    val name: String,
+    val points: Int,
+    val games: Int,
+    val totalEarnings: Int,
+    val link: String,
+)
