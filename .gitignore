@@ -37,3 +37,4 @@ out/
 .vscode/
 
 *.p8
+*.pem
