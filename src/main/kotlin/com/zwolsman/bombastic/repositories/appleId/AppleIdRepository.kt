@@ -25,7 +25,7 @@ class AppleIdRepository(
 
     suspend fun validateCode(secret: String, authCode: String): TokenResponse {
         val formBody = BodyInserters
-            .fromFormData("clientId", appleConfiguration.clientId)
+            .fromFormData("client_id", appleConfiguration.clientId)
             .with("client_secret", secret)
             .with("code", authCode)
             .with("grant_type", "authorization_code")
