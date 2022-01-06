@@ -32,6 +32,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation("org.zalando:problem-spring-webflux:0.28.0-RC.0")
+	implementation("org.bitbucket.b_c:jose4j:0.7.9")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	runtimeOnly("io.micrometer:micrometer-registry-prometheus")
 	runtimeOnly("io.r2dbc:r2dbc-postgresql")

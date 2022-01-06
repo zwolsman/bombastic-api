@@ -2,3 +2,8 @@ spring:
   r2dbc:
     url: r2dbc:postgresql://localhost/postgres
     username: postgres
+
+apple:
+  keyId: REPLACE_ME
+  teamId: REPLACE_ME
+  clientId: dev.bombastic.app
