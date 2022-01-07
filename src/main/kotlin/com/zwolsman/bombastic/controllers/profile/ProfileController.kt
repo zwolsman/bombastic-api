@@ -1,5 +1,6 @@
 package com.zwolsman.bombastic.controllers.profile
 
+import com.zwolsman.bombastic.services.ProfileService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -8,16 +9,25 @@ import java.security.Principal
 
 @RestController
 @RequestMapping("/api/v1/profiles")
-class ProfileController {
+class ProfileController(private val profileService: ProfileService) {
 
     @GetMapping("/me")
     suspend fun userProfile(principal: Principal): SimpleProfile {
-        return SimpleProfile(principal.name, 1000, 0, 0, "link")
+        return byId(principal.name)
     }
 
     @GetMapping("/{id}")
-    fun byId(@PathVariable id: String): SimpleProfile {
-        return SimpleProfile(id, 1000, 0, 0, "link")
+    suspend fun byId(@PathVariable id: String): SimpleProfile {
+        val profile = profileService
+            .findById(id)
+
+        return SimpleProfile(
+            profile.name,
+            profile.points,
+            profile.gamesPlayed,
+            profile.pointsEarned,
+            "https://bombastic.io/u/${profile.id}"
+        )
     }
 }
 

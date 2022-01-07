@@ -33,4 +33,8 @@ class ProfileService(private val repo: ProfileRepository) {
     suspend fun findByAppleUserId(appleUserId: String): ProfileModel {
         return repo.findByAppleUserId(appleUserId).awaitSingle()
     }
+
+    suspend fun findById(id: String): ProfileModel {
+        return repo.findById(id.toLong()).awaitSingle()
+    }
 }
