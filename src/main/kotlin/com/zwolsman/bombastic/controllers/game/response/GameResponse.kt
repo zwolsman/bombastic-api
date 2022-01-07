@@ -16,6 +16,7 @@ class GameResponse(
     val stake: Int,
     val next: Int?,
     val multiplier: Double,
+    val colorId: Int,
     val state: Game.State,
     val secret: String,
     val plain: String?,
@@ -40,6 +41,7 @@ fun GameResponse(game: Game): GameResponse = GameResponse(
     stake = game.stake,
     next = game.next,
     multiplier = game.multiplier,
+    colorId = game.colorId,
     state = game.state,
     secret = game.secret.sha256(),
     plain = if (game.state != Game.State.IN_GAME) {
