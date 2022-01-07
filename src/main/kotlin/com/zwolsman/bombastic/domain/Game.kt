@@ -34,6 +34,7 @@ data class Game(
     val next = GameLogic.calculateNext(this)
     val bombs: List<Int>
         get() = secret.split("-").dropLast(1).map(String::toInt)
+    val multiplier = stake / initialBet.toDouble()
 
     enum class State {
         IN_GAME,

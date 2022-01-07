@@ -2,9 +2,10 @@ package com.zwolsman.bombastic.controllers.game
 
 import com.zwolsman.bombastic.controllers.game.response.GameDetailsResponse
 import com.zwolsman.bombastic.controllers.game.response.GameResponse
+import com.zwolsman.bombastic.controllers.game.response.GamesResponse
 import com.zwolsman.bombastic.services.GameService
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
@@ -47,10 +48,12 @@ class GameController(private val gameService: GameService) {
     }
 
     @GetMapping
-    fun games(principal: Principal): Flow<GameResponse> {
+    suspend fun games(principal: Principal): GamesResponse {
         return gameService
             .allGames(owner = principal.name)
             .map(::GameResponse)
+            .toList()
+            .let(::GamesResponse)
     }
 
     @PutMapping("/{id}/guess")

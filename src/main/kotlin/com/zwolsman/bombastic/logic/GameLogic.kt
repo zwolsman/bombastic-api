@@ -20,35 +20,49 @@ object GameLogic {
         require(tileId !in game.tiles.map(Tile::id)) { "Tile is already guessed" }
 
         val didHitBomb = tileId in game.bombs
-        val result = if (didHitBomb)
-            game.bombs.filter { it != tileId }
+        if (didHitBomb) {
+            val tiles = game.bombs.filter { it != tileId }
                 .map { Bomb(it, false) } +
                 Bomb(tileId, true)
-        else
-            listOf(Points(tileId, game.next))
+            return game.hitBomb(tiles)
+        }
+
+        requireNotNull(game.next)
+        val points = Points(tileId, game.next)
+
+        if (game.tiles.size + game.bombs.size + 1 == tileRange.count()) {
+            return cashOut(game.copy(tiles = game.tiles + points))
+        }
 
         return game.copy(
-            tiles = game.tiles + result,
-            state = if (didHitBomb)
-                Game.State.HIT_BOMB
-            else
-                Game.State.IN_GAME
+            tiles = game.tiles + points
+        )
+    }
+
+    private fun Game.hitBomb(tiles: List<Tile>): Game {
+        return copy(
+            tiles = this.tiles + tiles,
+            state = Game.State.HIT_BOMB
         )
     }
 
     fun cashOut(game: Game): Game {
         require(game.state == Game.State.IN_GAME) { "Game is already finished" }
         return game.copy(
-            state = Game.State.CASHED_OUT
+            state = Game.State.CASHED_OUT,
+            tiles = game.tiles + game.bombs.map { Bomb(it, false) }
         )
     }
 
-    fun calculateNext(game: Game): Int {
+    fun calculateNext(game: Game): Int? {
         val guessedTiles = game.tiles.filterIsInstance<Points>().size
         var odds = (25 - guessedTiles) / (25.0 - guessedTiles - game.bombs.size)
         odds *= (1 - stitching)
 
-        return floor(game.stake * odds).toInt() - game.stake
+        return when (odds) {
+            Double.POSITIVE_INFINITY -> null
+            else -> floor(game.stake * odds).toInt() - game.stake
+        }
     }
 
     fun generateSecret(amountOfBombs: Int): String {

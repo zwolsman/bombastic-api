@@ -14,10 +14,15 @@ class GameResponse(
     val id: String,
     val tiles: List<Tile>,
     val stake: Int,
-    val next: Int,
+    val next: Int?,
+    val multiplier: Double,
     val state: Game.State,
     val secret: String,
     val plain: String?,
+)
+
+class GamesResponse(
+    val games: List<GameResponse>
 )
 
 @JsonComponent
@@ -34,6 +39,7 @@ fun GameResponse(game: Game): GameResponse = GameResponse(
     tiles = game.tiles,
     stake = game.stake,
     next = game.next,
+    multiplier = game.multiplier,
     state = game.state,
     secret = game.secret.sha256(),
     plain = if (game.state != Game.State.IN_GAME) {
