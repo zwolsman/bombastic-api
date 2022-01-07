@@ -11,6 +11,8 @@ object GameLogic {
     private val rng = SecureRandom()
     private val tileRange = 1..25
     private const val stitching = 0.005
+    private val allowedBombAmounts = listOf(1, 3, 5, 24)
+    private const val alphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     fun guess(game: Game, tileId: Int): Game {
         require(game.state == Game.State.IN_GAME) { "Game is already finished" }
@@ -19,7 +21,9 @@ object GameLogic {
 
         val didHitBomb = tileId in game.bombs
         val result = if (didHitBomb)
-            game.bombs.map { Bomb(it, it == tileId) }
+            game.bombs.filter { it != tileId }
+                .map { Bomb(it, false) } +
+                Bomb(tileId, true)
         else
             listOf(Points(tileId, game.next))
 
@@ -47,7 +51,6 @@ object GameLogic {
         return floor(game.stake * odds).toInt() - game.stake
     }
 
-    private const val alphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     fun generateSecret(amountOfBombs: Int): String {
         val bombs = generateBombs(amountOfBombs).joinToString(separator = "-")
         val str = generateRandomString(16)
@@ -63,8 +66,7 @@ object GameLogic {
             .joinToString(separator = "")
 
     private fun generateBombs(amount: Int): Set<Int> {
-        require(amount in tileRange)
-        require(amount < tileRange.last)
+        require(amount in allowedBombAmounts) { "Allowed amounts of bombs: ${allowedBombAmounts.joinToString()}" }
 
         return generateSequence { tileRange.random(rng) }
             .distinct()

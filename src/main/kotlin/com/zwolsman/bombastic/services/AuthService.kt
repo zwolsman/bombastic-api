@@ -30,10 +30,10 @@ class AuthService(
         val converter = JcaPEMKeyConverter()
         val keys = parser.readObject() as PEMKeyPair
 
-        val pubKey = converter.getPublicKey(keys.publicKeyInfo)
+        val publicKey = converter.getPublicKey(keys.publicKeyInfo)
         val privateKey = converter.getPrivateKey(keys.privateKeyInfo)
 
-        KeyPair(pubKey, privateKey)
+        KeyPair(publicKey, privateKey)
     }
 
     private val rsaJsonWebKey = JsonWebKey.Factory.newJwk(keys.public).apply {

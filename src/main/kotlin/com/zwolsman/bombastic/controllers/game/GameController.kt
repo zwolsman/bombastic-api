@@ -32,14 +32,14 @@ class GameController(private val gameService: GameService) {
             .let(::GameResponse)
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     suspend fun game(@PathVariable id: String): GameResponse {
         return gameService
             .byId(id)
             .let(::GameResponse)
     }
 
-    @GetMapping("{id}/details")
+    @GetMapping("/{id}/details")
     suspend fun gameDetails(@PathVariable id: String): GameDetailsResponse {
         return gameService
             .byId(gameId = id)
@@ -53,14 +53,14 @@ class GameController(private val gameService: GameService) {
             .map(::GameResponse)
     }
 
-    @PutMapping("{id}/guess")
+    @PutMapping("/{id}/guess")
     suspend fun guess(@PathVariable id: String, @RequestParam tileId: Int, principal: Principal): GameResponse {
         return gameService
             .guess(owner = principal.name, gameId = id, tileId)
             .let(::GameResponse)
     }
 
-    @PutMapping("{id}/cash-out")
+    @PutMapping("/{id}/cash-out")
     suspend fun cashOut(@PathVariable id: String, principal: Principal): GameResponse {
         return gameService
             .cashOut(owner = principal.name, gameId = id)
