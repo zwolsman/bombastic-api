@@ -7,5 +7,5 @@ import reactor.core.publisher.Flux
 
 @Repository
 interface GameRepository : ReactiveCrudRepository<GameModel, String> {
-    fun findAllByOwnerId(ownerId: String): Flux<GameModel>
+    fun findAllByOwnerIdOrderByIdDesc(ownerId: String): Flux<GameModel>
 }

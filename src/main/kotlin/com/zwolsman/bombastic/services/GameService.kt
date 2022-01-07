@@ -28,7 +28,7 @@ class GameService(private val repo: GameRepository) {
 
     fun allGames(owner: String): Flow<Game> {
         return repo
-            .findAllByOwnerId(ownerId = owner)
+            .findAllByOwnerIdOrderByIdDesc(ownerId = owner)
             .map(::Game)
             .asFlow()
     }
