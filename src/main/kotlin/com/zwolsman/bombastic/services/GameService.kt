@@ -10,9 +10,12 @@ import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class GameService(private val profileService: ProfileService, private val gameRepository: GameRepository) {
+
+    @Transactional
     suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, ProfileModel> {
         val model = GameModel(
             ownerId = owner,
@@ -21,13 +24,11 @@ class GameService(private val profileService: ProfileService, private val gameRe
             secret = GameLogic.generateSecret(amountOfBombs),
         )
 
-        // START TRANSACTION
         val game = gameRepository
             .save(model)
             .awaitSingle()
             .let(::Game)
         val profile = profileService.modifyPoints(id = owner, -initialBet)
-        // END TRANSACTION
 
         return game to profile
     }
@@ -44,42 +45,40 @@ class GameService(private val profileService: ProfileService, private val gameRe
         return model.let(::Game)
     }
 
+    @Transactional
     suspend fun guess(owner: String, gameId: String, tileId: Int): Pair<Game, ProfileModel?> {
         val model = byId(gameId)
             .requireOwner(owner)
             .let { GameLogic.guess(it, tileId) }
             .let(::GameModel)
 
-        // START TRANSACTION
         val game = gameRepository
             .save(model)
             .awaitSingle()
             .let(::Game)
 
-        // Game has been automatically cashed out
+        // Game has been automatically cashed out because there are no moves left anymore
         val profile = if (game.state == Game.State.CASHED_OUT)
             profileService.modifyPoints(id = owner, game.stake)
         else
             null
-        // END TRANSACTION
 
         return game to profile
     }
 
+    @Transactional
     suspend fun cashOut(owner: String, gameId: String): Pair<Game, ProfileModel> {
         val model = byId(gameId)
             .requireOwner(owner)
             .let { GameLogic.cashOut(it) }
             .let(::GameModel)
 
-        // START TRANSACTION
         val game = gameRepository
             .save(model)
             .awaitSingle()
             .let(::Game)
 
         val profile = profileService.modifyPoints(id = owner, game.stake)
-        // END TRANSACTION
 
         return game to profile
     }
