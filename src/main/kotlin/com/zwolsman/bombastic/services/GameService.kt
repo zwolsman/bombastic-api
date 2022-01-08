@@ -1,6 +1,7 @@
 package com.zwolsman.bombastic.services
 
 import com.zwolsman.bombastic.db.GameModel
+import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.domain.Game
 import com.zwolsman.bombastic.logic.GameLogic
 import com.zwolsman.bombastic.repositories.GameRepository
@@ -11,8 +12,8 @@ import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
 
 @Service
-class GameService(private val repo: GameRepository) {
-    suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Game {
+class GameService(private val profileService: ProfileService, private val gameRepository: GameRepository) {
+    suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, ProfileModel> {
         val model = GameModel(
             ownerId = owner,
             initialBet = initialBet,
@@ -20,46 +21,67 @@ class GameService(private val repo: GameRepository) {
             secret = GameLogic.generateSecret(amountOfBombs),
         )
 
-        return repo
+        // START TRANSACTION
+        val game = gameRepository
             .save(model)
             .awaitSingle()
             .let(::Game)
+        val profile = profileService.modifyPoints(id = owner, -initialBet)
+        // END TRANSACTION
+
+        return game to profile
     }
 
     fun allGames(owner: String): Flow<Game> {
-        return repo
+        return gameRepository
             .findAllByOwnerIdOrderByIdDesc(ownerId = owner)
             .map(::Game)
             .asFlow()
     }
 
     suspend fun byId(gameId: String): Game {
-        val model = repo.findById(gameId).awaitSingleOrNull() ?: throw GameNotFound(gameId)
+        val model = gameRepository.findById(gameId).awaitSingleOrNull() ?: throw GameNotFound(gameId)
         return model.let(::Game)
     }
 
-    suspend fun guess(owner: String, gameId: String, tileId: Int): Game {
+    suspend fun guess(owner: String, gameId: String, tileId: Int): Pair<Game, ProfileModel?> {
         val model = byId(gameId)
             .requireOwner(owner)
             .let { GameLogic.guess(it, tileId) }
             .let(::GameModel)
 
-        return repo
+        // START TRANSACTION
+        val game = gameRepository
             .save(model)
             .awaitSingle()
             .let(::Game)
+
+        // Game has been automatically cashed out
+        val profile = if (game.state == Game.State.CASHED_OUT)
+            profileService.modifyPoints(id = owner, game.stake)
+        else
+            null
+        // END TRANSACTION
+
+        return game to profile
     }
 
-    suspend fun cashOut(owner: String, gameId: String): Game {
+    suspend fun cashOut(owner: String, gameId: String): Pair<Game, ProfileModel> {
         val model = byId(gameId)
             .requireOwner(owner)
             .let { GameLogic.cashOut(it) }
             .let(::GameModel)
 
-        return repo
+        // START TRANSACTION
+        val game = gameRepository
             .save(model)
             .awaitSingle()
             .let(::Game)
+
+        val profile = profileService.modifyPoints(id = owner, game.stake)
+        // END TRANSACTION
+
+        return game to profile
     }
 
     private fun Game.requireOwner(ownerId: String) = apply { require(owner == ownerId) }

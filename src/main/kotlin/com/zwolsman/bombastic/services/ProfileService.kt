@@ -37,4 +37,12 @@ class ProfileService(private val repo: ProfileRepository) {
     suspend fun findById(id: String): ProfileModel {
         return repo.findById(id.toLong()).awaitSingle()
     }
+
+    suspend fun modifyPoints(id: String, points: Int): ProfileModel {
+        val model = repo.findById(id.toLong()).awaitSingle()
+        model.points += points
+        return repo
+            .save(model)
+            .awaitSingle()
+    }
 }

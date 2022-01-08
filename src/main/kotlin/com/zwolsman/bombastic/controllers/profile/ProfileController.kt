@@ -1,5 +1,6 @@
 package com.zwolsman.bombastic.controllers.profile
 
+import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.services.ProfileService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -12,29 +13,30 @@ import java.security.Principal
 class ProfileController(private val profileService: ProfileService) {
 
     @GetMapping("/me")
-    suspend fun userProfile(principal: Principal): SimpleProfile {
+    suspend fun userProfile(principal: Principal): ProfileResponse {
         return byId(principal.name)
     }
 
     @GetMapping("/{id}")
-    suspend fun byId(@PathVariable id: String): SimpleProfile {
-        val profile = profileService
+    suspend fun byId(@PathVariable id: String): ProfileResponse {
+        return profileService
             .findById(id)
-
-        return SimpleProfile(
-            profile.name,
-            profile.points,
-            profile.gamesPlayed,
-            profile.pointsEarned,
-            "https://bombastic.io/u/${profile.id}"
-        )
+            .let(::ProfileResponse)
     }
 }
 
-data class SimpleProfile(
+data class ProfileResponse(
     val name: String,
     val points: Int,
     val games: Int,
     val totalEarnings: Int,
     val link: String,
+)
+
+fun ProfileResponse(model: ProfileModel) = ProfileResponse(
+    model.name,
+    model.points,
+    model.gamesPlayed,
+    model.pointsEarned,
+    "https://bombastic.io/u/${model.id}"
 )

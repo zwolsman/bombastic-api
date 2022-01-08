@@ -1,6 +1,6 @@
 package com.zwolsman.bombastic.controllers.game
 
-import com.zwolsman.bombastic.controllers.game.response.GameDetailsResponse
+import com.zwolsman.bombastic.controllers.game.response.GameProfileResponse
 import com.zwolsman.bombastic.controllers.game.response.GameResponse
 import com.zwolsman.bombastic.controllers.game.response.GamesResponse
 import com.zwolsman.bombastic.services.GameService
@@ -25,12 +25,12 @@ class GameController(private val gameService: GameService) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun create(@RequestBody payload: CreateGamePayload, principal: Principal): GameResponse {
+    suspend fun create(@RequestBody payload: CreateGamePayload, principal: Principal): GameProfileResponse {
         val (initialBet, bombs, colorId) = payload
 
         return gameService
             .create(owner = principal.name, initialBet, bombs, colorId)
-            .let(::GameResponse)
+            .let(::GameProfileResponse)
     }
 
     @GetMapping("/{id}")
@@ -38,13 +38,6 @@ class GameController(private val gameService: GameService) {
         return gameService
             .byId(id)
             .let(::GameResponse)
-    }
-
-    @GetMapping("/{id}/details")
-    suspend fun gameDetails(@PathVariable id: String): GameDetailsResponse {
-        return gameService
-            .byId(gameId = id)
-            .let(::GameDetailsResponse)
     }
 
     @GetMapping
@@ -57,17 +50,17 @@ class GameController(private val gameService: GameService) {
     }
 
     @PutMapping("/{id}/guess")
-    suspend fun guess(@PathVariable id: String, @RequestParam tileId: Int, principal: Principal): GameResponse {
+    suspend fun guess(@PathVariable id: String, @RequestParam tileId: Int, principal: Principal): GameProfileResponse {
         return gameService
             .guess(owner = principal.name, gameId = id, tileId)
-            .let(::GameResponse)
+            .let(::GameProfileResponse)
     }
 
     @PutMapping("/{id}/cash-out")
-    suspend fun cashOut(@PathVariable id: String, principal: Principal): GameResponse {
+    suspend fun cashOut(@PathVariable id: String, principal: Principal): GameProfileResponse {
         return gameService
             .cashOut(owner = principal.name, gameId = id)
-            .let(::GameResponse)
+            .let(::GameProfileResponse)
     }
 
     @ExceptionHandler(IllegalArgumentException::class)

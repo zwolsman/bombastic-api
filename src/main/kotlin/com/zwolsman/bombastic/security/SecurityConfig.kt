@@ -69,4 +69,3 @@ class SecurityConfig(
         return CorsWebFilter(source)
     }
 }
-
