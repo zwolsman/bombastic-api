@@ -3,10 +3,12 @@ package com.zwolsman.bombastic.controllers.game
 import com.zwolsman.bombastic.controllers.game.response.GameProfileResponse
 import com.zwolsman.bombastic.controllers.game.response.GameResponse
 import com.zwolsman.bombastic.controllers.game.response.GamesResponse
+import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.services.GameService
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
-import java.security.Principal
 
 @RestController
 @RequestMapping("/api/v1/games")
@@ -25,11 +26,14 @@ class GameController(private val gameService: GameService) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    suspend fun create(@RequestBody payload: CreateGamePayload, principal: Principal): GameProfileResponse {
+    suspend fun create(
+        @RequestBody payload: CreateGamePayload,
+        @AuthenticationPrincipal profile: Profile
+    ): GameProfileResponse {
         val (initialBet, bombs, colorId) = payload
 
         return gameService
-            .create(owner = principal.name, initialBet, bombs, colorId)
+            .create(owner = profile.id, initialBet, bombs, colorId)
             .let(::GameProfileResponse)
     }
 
@@ -41,25 +45,29 @@ class GameController(private val gameService: GameService) {
     }
 
     @GetMapping
-    suspend fun games(principal: Principal): GamesResponse {
+    suspend fun games(@AuthenticationPrincipal profile: Profile): GamesResponse {
         return gameService
-            .allGames(owner = principal.name)
+            .allGames(owner = profile.id)
             .map(::GameResponse)
             .toList()
             .let(::GamesResponse)
     }
 
     @PutMapping("/{id}/guess")
-    suspend fun guess(@PathVariable id: String, @RequestParam tileId: Int, principal: Principal): GameProfileResponse {
+    suspend fun guess(
+        @PathVariable id: String,
+        @RequestParam tileId: Int,
+        @AuthenticationPrincipal profile: Profile
+    ): GameProfileResponse {
         return gameService
-            .guess(owner = principal.name, gameId = id, tileId)
+            .guess(owner = profile.id, gameId = id, tileId)
             .let(::GameProfileResponse)
     }
 
     @PutMapping("/{id}/cash-out")
-    suspend fun cashOut(@PathVariable id: String, principal: Principal): GameProfileResponse {
+    suspend fun cashOut(@PathVariable id: String, @AuthenticationPrincipal profile: Profile): GameProfileResponse {
         return gameService
-            .cashOut(owner = principal.name, gameId = id)
+            .cashOut(owner = profile.id, gameId = id)
             .let(::GameProfileResponse)
     }
 

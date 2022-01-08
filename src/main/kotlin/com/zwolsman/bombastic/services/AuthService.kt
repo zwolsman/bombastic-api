@@ -1,6 +1,6 @@
 package com.zwolsman.bombastic.services
 
-import com.zwolsman.bombastic.db.ProfileModel
+import com.zwolsman.bombastic.domain.Profile
 import org.bouncycastle.openssl.PEMKeyPair
 import org.bouncycastle.openssl.PEMParser
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter
@@ -50,7 +50,7 @@ class AuthService(
         )
         .build()
 
-    private fun createAccessToken(profile: ProfileModel): String {
+    private fun createAccessToken(profile: Profile): String {
         val claims = JwtClaims()
         claims.issuer = issuer
 

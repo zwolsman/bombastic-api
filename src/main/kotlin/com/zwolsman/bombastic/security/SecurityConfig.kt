@@ -49,6 +49,8 @@ class SecurityConfig(
             .pathMatchers(
                 "/api/v1/auth/sign-up",
                 "/api/v1/auth/verify",
+                "/api/swagger-*/**",
+                "/v3/api-docs"
             ).permitAll()
             .pathMatchers("/api/**").authenticated()
             .anyExchange().permitAll()

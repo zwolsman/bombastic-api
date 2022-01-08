@@ -5,6 +5,7 @@ import com.zwolsman.bombastic.config.PointsOffers
 import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.domain.Offer
 import com.zwolsman.bombastic.domain.PayOutOffer
+import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.services.ProfileService
 import org.springframework.stereotype.Service
 
@@ -28,7 +29,7 @@ class StoreService(private val profileService: ProfileService) {
             null
     }
 
-    suspend fun purchase(profileId: String, offerId: String): ProfileModel {
+    suspend fun purchase(profileId: String, offerId: String): Profile {
         val offer = if (offerId == "pay-out-all")
             personalOffer(profileId)
         else

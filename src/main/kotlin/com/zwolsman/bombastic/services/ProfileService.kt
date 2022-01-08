@@ -4,6 +4,7 @@ import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.domain.Offer
 import com.zwolsman.bombastic.domain.PayOutOffer
 import com.zwolsman.bombastic.domain.PointOffer
+import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.repositories.ProfileRepository
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Service
@@ -16,7 +17,7 @@ class ProfileService(private val repo: ProfileRepository) {
         appleUserId: String,
         appleRefreshToken: String,
         appleAccessToken: String
-    ): ProfileModel {
+    ): Profile {
         val profile = ProfileModel(
             points = 1000,
             name = name,
@@ -32,45 +33,54 @@ class ProfileService(private val repo: ProfileRepository) {
         return repo
             .save(profile)
             .awaitSingle()
+            .let(::Profile)
     }
 
-    suspend fun findByAppleUserId(appleUserId: String): ProfileModel {
+    suspend fun findByAppleUserId(appleUserId: String): Profile {
         return repo
             .findByAppleUserId(appleUserId)
             .awaitSingle()
+            .let(::Profile)
     }
 
-    suspend fun findById(id: String): ProfileModel {
+    suspend fun findById(id: String): Profile {
+        return findModelById(id)
+            .let(::Profile)
+    }
+
+    private suspend fun findModelById(id: String): ProfileModel {
         return repo
             .findById(id.toLong())
             .awaitSingle()
     }
 
-    suspend fun modifyPoints(id: String, points: Int, earned: Int): ProfileModel {
+    suspend fun modifyPoints(id: String, points: Int, earned: Int): Profile {
         require(points >= 0)
         require(earned >= 0)
 
-        val model = findById(id)
+        val model = findModelById(id)
         model.points += points
         model.pointsEarned += earned
 
         return repo
             .save(model)
             .awaitSingle()
+            .let(::Profile)
     }
 
-    suspend fun createGame(id: String, initialBet: Int): ProfileModel {
-        val model = findById(id)
+    suspend fun createGame(id: String, initialBet: Int): Profile {
+        val model = findModelById(id)
         model.points -= initialBet
         model.gamesPlayed += 1
 
         return repo
             .save(model)
             .awaitSingle()
+            .let(::Profile)
     }
 
-    suspend fun redeemOffer(id: String, offer: Offer): ProfileModel {
-        val model = findById(id)
+    suspend fun redeemOffer(id: String, offer: Offer): Profile {
+        val model = findModelById(id)
 
         when (offer) {
             is PayOutOffer -> {
@@ -87,5 +97,6 @@ class ProfileService(private val repo: ProfileRepository) {
         return repo
             .save(model)
             .awaitSingle()
+            .let(::Profile)
     }
 }

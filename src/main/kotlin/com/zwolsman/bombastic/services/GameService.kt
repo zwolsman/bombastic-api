@@ -1,8 +1,8 @@
 package com.zwolsman.bombastic.services
 
 import com.zwolsman.bombastic.db.GameModel
-import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.domain.Game
+import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.logic.GameLogic
 import com.zwolsman.bombastic.repositories.GameRepository
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional
 class GameService(private val profileService: ProfileService, private val gameRepository: GameRepository) {
 
     @Transactional
-    suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, ProfileModel> {
+    suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
         val model = GameModel(
             ownerId = owner,
             initialBet = initialBet,
@@ -48,7 +48,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
     }
 
     @Transactional
-    suspend fun guess(owner: String, gameId: String, tileId: Int): Pair<Game, ProfileModel?> {
+    suspend fun guess(owner: String, gameId: String, tileId: Int): Pair<Game, Profile?> {
         val model = byId(gameId)
             .requireOwner(owner)
             .let { GameLogic.guess(it, tileId) }
@@ -69,7 +69,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
     }
 
     @Transactional
-    suspend fun cashOut(owner: String, gameId: String): Pair<Game, ProfileModel> {
+    suspend fun cashOut(owner: String, gameId: String): Pair<Game, Profile> {
         val model = byId(gameId)
             .requireOwner(owner)
             .let { GameLogic.cashOut(it) }
