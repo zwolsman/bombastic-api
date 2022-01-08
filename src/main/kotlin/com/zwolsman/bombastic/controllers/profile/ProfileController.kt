@@ -31,6 +31,7 @@ data class ProfileResponse(
     val games: Int,
     val totalEarnings: Int,
     val link: String,
+    val balanceInEur: Double,
 )
 
 fun ProfileResponse(model: ProfileModel) = ProfileResponse(
@@ -38,5 +39,6 @@ fun ProfileResponse(model: ProfileModel) = ProfileResponse(
     model.points,
     model.gamesPlayed,
     model.pointsEarned,
-    "https://bombastic.io/u/${model.id}"
+    "https://bombastic.io/u/${model.id}",
+    model.balanceInEur,
 )

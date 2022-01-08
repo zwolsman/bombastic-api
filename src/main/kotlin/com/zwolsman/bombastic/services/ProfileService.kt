@@ -1,5 +1,6 @@
 package com.zwolsman.bombastic.services
 
+import com.zwolsman.bombastic.controllers.store.Offer
 import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.repositories.ProfileRepository
 import kotlinx.coroutines.reactor.awaitSingle
@@ -22,7 +23,8 @@ class ProfileService(private val repo: ProfileRepository) {
             pointsEarned = 0,
             appleUserId = appleUserId,
             appleRefreshToken = appleRefreshToken,
-            appleAccessToken = appleAccessToken
+            appleAccessToken = appleAccessToken,
+            balanceInEur = 10.0,
         )
 
         return repo
@@ -31,16 +33,32 @@ class ProfileService(private val repo: ProfileRepository) {
     }
 
     suspend fun findByAppleUserId(appleUserId: String): ProfileModel {
-        return repo.findByAppleUserId(appleUserId).awaitSingle()
+        return repo
+            .findByAppleUserId(appleUserId)
+            .awaitSingle()
     }
 
     suspend fun findById(id: String): ProfileModel {
-        return repo.findById(id.toLong()).awaitSingle()
+        return repo
+            .findById(id.toLong())
+            .awaitSingle()
     }
 
     suspend fun modifyPoints(id: String, points: Int): ProfileModel {
-        val model = repo.findById(id.toLong()).awaitSingle()
+        val model = findById(id)
         model.points += points
+
+        return repo
+            .save(model)
+            .awaitSingle()
+    }
+
+    suspend fun redeemOffer(id: String, offer: Offer): ProfileModel {
+        val model = findById(id)
+        model.points += offer.points
+        model.balanceInEur -= offer.price
+
+        require(model.points >= 0)
         return repo
             .save(model)
             .awaitSingle()

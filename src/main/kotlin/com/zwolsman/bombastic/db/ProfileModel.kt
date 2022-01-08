@@ -10,6 +10,7 @@ data class ProfileModel(
     var email: String,
     var gamesPlayed: Int,
     var pointsEarned: Int,
+    var balanceInEur: Double,
 
     @Id
     var id: Long? = null,
