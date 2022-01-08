@@ -2,7 +2,7 @@ package com.zwolsman.bombastic.security
 
 import com.zwolsman.bombastic.services.AuthService
 import com.zwolsman.bombastic.services.ProfileService
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.reactor.mono
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
@@ -14,9 +14,9 @@ class AuthenticationManager(private val authService: AuthService, private val pr
     override fun authenticate(authentication: Authentication): Mono<Authentication> {
         val token = authentication.credentials.toString()
         val claims = authService.claims(token)
-        val profile = runBlocking { profileService.findById(claims.subject) } // TODO
+        val profile = mono { profileService.findById(claims.subject) }
 
-        return Mono.just(AuthenticatedProfile(profile))
+        return profile.map(::AuthenticatedProfile)
     }
 }
 
