@@ -1,7 +1,9 @@
 package com.zwolsman.bombastic.services
 
-import com.zwolsman.bombastic.controllers.store.Offer
 import com.zwolsman.bombastic.db.ProfileModel
+import com.zwolsman.bombastic.domain.Offer
+import com.zwolsman.bombastic.domain.PayOutOffer
+import com.zwolsman.bombastic.domain.PointOffer
 import com.zwolsman.bombastic.repositories.ProfileRepository
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Service
@@ -69,10 +71,19 @@ class ProfileService(private val repo: ProfileRepository) {
 
     suspend fun redeemOffer(id: String, offer: Offer): ProfileModel {
         val model = findById(id)
-        model.points += offer.points
-        model.balanceInEur -= offer.price
 
-        require(model.points >= 0)
+        when (offer) {
+            is PayOutOffer -> {
+                model.balanceInEur += offer.reward
+                model.points -= offer.price.toInt()
+                require(model.points >= 0) { "Not enough points to cash out" }
+            }
+            is PointOffer -> {
+                model.balanceInEur -= offer.price
+                model.points += offer.reward.toInt()
+            }
+        }
+
         return repo
             .save(model)
             .awaitSingle()
