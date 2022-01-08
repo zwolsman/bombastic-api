@@ -41,7 +41,9 @@ class GameService(private val profileService: ProfileService, private val gameRe
     }
 
     suspend fun byId(gameId: String): Game {
-        val model = gameRepository.findById(gameId).awaitSingleOrNull() ?: throw GameNotFound(gameId)
+        val model = gameRepository.findById(gameId).awaitSingleOrNull()
+        requireNotNull(model) { "Game not found" }
+
         return model.let(::Game)
     }
 
@@ -87,5 +89,3 @@ class GameService(private val profileService: ProfileService, private val gameRe
     private val Game.earned: Int
         get() = stake - initialBet
 }
-
-class GameNotFound(gameId: String) : Exception("Game not found with id '$gameId'")
