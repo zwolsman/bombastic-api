@@ -19,6 +19,8 @@ class GameResponse(
     val colorId: Int,
     val state: Game.State,
     val secret: String,
+    var bombs: Int,
+    var initialBet: Int,
     val plain: String?,
 )
 
@@ -43,12 +45,10 @@ fun GameResponse(game: Game): GameResponse = GameResponse(
     multiplier = game.multiplier,
     colorId = game.colorId,
     state = game.state,
+    bombs = game.bombs.size,
+    initialBet = game.initialBet,
     secret = game.secret.sha256(),
-    plain = if (game.state != Game.State.IN_GAME) {
-        game.secret
-    } else {
-        null
-    }
+    plain = game.state.takeIf { it == Game.State.IN_GAME }?.let { game.secret }
 )
 
 private fun String.sha256(): String {
