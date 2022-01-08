@@ -7,3 +7,6 @@ apple:
   keyId: REPLACE_ME
   teamId: REPLACE_ME
   clientId: dev.bombastic.app
+
+r2dbc.migrate.resources-paths:
+  - classpath:/db/migration/*.sql

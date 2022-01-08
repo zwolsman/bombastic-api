@@ -35,6 +35,7 @@ dependencies {
     implementation("org.zalando:problem-spring-webflux:0.28.0-RC.0")
     implementation("org.bitbucket.b_c:jose4j:0.7.9")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
+    implementation("name.nkonev.r2dbc-migrate:r2dbc-migrate-spring-boot-starter:1.8.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
     runtimeOnly("io.r2dbc:r2dbc-postgresql")
