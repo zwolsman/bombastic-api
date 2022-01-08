@@ -10,7 +10,7 @@ import kotlin.math.floor
 object GameLogic {
     private val rng = SecureRandom()
     private val tileRange = 1..25
-    private const val stitching = 0.005
+    const val houseEdge = 0.005
     private val allowedBombAmounts = listOf(1, 3, 5, 24)
     private const val alphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
@@ -55,13 +55,17 @@ object GameLogic {
     }
 
     fun calculateNext(game: Game): Int? {
+        val tiles = tileRange.count().toDouble()
         val guessedTiles = game.tiles.filterIsInstance<Points>().size
-        var odds = (25 - guessedTiles) / (25.0 - guessedTiles - game.bombs.size)
-        odds *= (1 - stitching)
+        val bombs = game.bombs.size
+        val tilesLeft = tiles - guessedTiles
 
-        return when (odds) {
+        var multiplier = tilesLeft / (tilesLeft - bombs)
+        multiplier *= 1 - houseEdge
+
+        return when (multiplier) {
             Double.POSITIVE_INFINITY -> null
-            else -> floor(game.stake * odds).toInt() - game.stake
+            else -> floor(game.stake * multiplier).toInt() - game.stake
         }
     }
 

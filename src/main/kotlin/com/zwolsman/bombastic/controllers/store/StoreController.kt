@@ -1,5 +1,6 @@
 package com.zwolsman.bombastic.controllers.store
 
+import com.zwolsman.bombastic.logic.GameLogic
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -35,8 +36,6 @@ class StoreOfferResponse(val offers: List<PointsPackageResponse>)
 class PointsPackageResponse(val offerId: Int, val name: String, val price: Double, val points: Int, val bonus: Int)
 
 const val POINTS_PER_CENT = 0.002
-
-const val houseEdge = 0.005
 const val pointsPerGame = 100
 
 enum class PointsPackages(
@@ -48,7 +47,7 @@ enum class PointsPackages(
     PLATINUM(100, 0.004),
     DIAMOND(250, 0.002);
 
-    private val multiplier = 1 + (houseEdge - x)
+    private val multiplier = 1 + (GameLogic.houseEdge - x)
     private val basePoints = pointsPerGame * games
     val bonus = floor((multiplier * basePoints) - basePoints).toInt()
 
