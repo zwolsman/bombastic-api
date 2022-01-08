@@ -44,9 +44,23 @@ class ProfileService(private val repo: ProfileRepository) {
             .awaitSingle()
     }
 
-    suspend fun modifyPoints(id: String, points: Int): ProfileModel {
+    suspend fun modifyPoints(id: String, points: Int, earned: Int): ProfileModel {
+        require(points >= 0)
+        require(earned >= 0)
+
         val model = findById(id)
         model.points += points
+        model.pointsEarned += earned
+
+        return repo
+            .save(model)
+            .awaitSingle()
+    }
+
+    suspend fun createGame(id: String, initialBet: Int): ProfileModel {
+        val model = findById(id)
+        model.points -= initialBet
+        model.gamesPlayed += 1
 
         return repo
             .save(model)

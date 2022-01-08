@@ -28,7 +28,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
             .save(model)
             .awaitSingle()
             .let(::Game)
-        val profile = profileService.modifyPoints(id = owner, -initialBet)
+        val profile = profileService.createGame(id = owner, initialBet)
 
         return game to profile
     }
@@ -59,7 +59,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
         // Game has been automatically cashed out because there are no moves left anymore
         val profile = if (game.state == Game.State.CASHED_OUT)
-            profileService.modifyPoints(id = owner, game.stake)
+            profileService.modifyPoints(id = owner, game.stake, game.earned)
         else
             null
 
@@ -78,12 +78,14 @@ class GameService(private val profileService: ProfileService, private val gameRe
             .awaitSingle()
             .let(::Game)
 
-        val profile = profileService.modifyPoints(id = owner, game.stake)
+        val profile = profileService.modifyPoints(id = owner, game.stake, game.earned)
 
         return game to profile
     }
 
     private fun Game.requireOwner(ownerId: String) = apply { require(owner == ownerId) }
+    private val Game.earned: Int
+        get() = stake - initialBet
 }
 
 class GameNotFound(gameId: String) : Exception("Game not found with id '$gameId'")
