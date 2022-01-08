@@ -24,7 +24,7 @@ class ProfileService(private val repo: ProfileRepository) {
             appleUserId = appleUserId,
             appleRefreshToken = appleRefreshToken,
             appleAccessToken = appleAccessToken,
-            balanceInEur = 10.0,
+            balanceInEur = 0.0,
         )
 
         return repo
