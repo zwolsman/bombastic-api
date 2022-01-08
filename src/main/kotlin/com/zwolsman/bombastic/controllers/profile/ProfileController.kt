@@ -1,8 +1,8 @@
 package com.zwolsman.bombastic.controllers.profile
 
 import com.zwolsman.bombastic.domain.Profile
-import com.zwolsman.bombastic.security.AuthenticatedProfile
 import com.zwolsman.bombastic.services.ProfileService
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 class ProfileController(private val profileService: ProfileService) {
 
     @GetMapping("/me")
-    suspend fun userProfile(profile: AuthenticatedProfile): ProfileResponse {
+    suspend fun userProfile(@AuthenticationPrincipal profile: Profile): ProfileResponse {
         return profile
             .let(::ProfileResponse)
     }
@@ -36,7 +36,7 @@ data class ProfileResponse(
 )
 
 fun ProfileResponse(profile: Profile) = ProfileResponse(
-    profile.displayName,
+    profile.name,
     profile.points,
     profile.gamesPlayed,
     profile.pointsEarned,

@@ -5,9 +5,9 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.core.GrantedAuthority
 import java.util.Collections
 
-class AuthenticatedProfile(val profile: Profile) : Authentication, Profile by profile {
+class AuthenticatedProfile(val profile: Profile) : Authentication {
     override fun getName(): String {
-        return displayName
+        return profile.name
     }
 
     override fun getAuthorities(): MutableCollection<GrantedAuthority> {
