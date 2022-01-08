@@ -8,5 +8,11 @@ apple:
   teamId: REPLACE_ME
   clientId: dev.bombastic.app
 
+
+springfox:
+  documentation:
+    swagger-ui:
+      base-url: "/api"
+
 r2dbc.migrate.resources-paths:
   - classpath:/db/migration/*.sql
