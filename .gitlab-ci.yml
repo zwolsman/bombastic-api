@@ -9,11 +9,28 @@ before_script:
   - export IMAGE="$CONTAINER_NAME:$VERSION"
   - echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin $DOCKER_REGISTRY
 
+stages:
+  - build
+  - deploy
+
 build:
   image: openjdk:11
   stage: build
+  tags: [ docker ]
   script:
     - ./gradlew jib --image $IMAGE
   only:
     - main
     - merge_requests
+
+deploy:
+  stage: deploy
+  script:
+    - kubectl version
+    - kubectl config get-contexts
+    - cd infra/kubernetes/base
+    - kustomize edit set image $IMAGE
+    - kustomize build | kubectl apply -n bombastic -f -
+    - kubectl rollout status deployment/api -n bombastic --timeout=10m
+  only:
+    - main
