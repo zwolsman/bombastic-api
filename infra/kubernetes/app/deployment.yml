@@ -53,7 +53,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: apple-config
-                  key: teamId
+                  key: keyId
             - name: apple.teamId
               valueFrom:
                 secretKeyRef:
