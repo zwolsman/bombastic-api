@@ -7,7 +7,6 @@ before_script:
 
   - export VERSION="$(git describe --long 2>/dev/null || echo $(git describe --abbrev=0 2>/dev/null || echo 0.0.0)-g$CI_COMMIT_SHORT_SHA)"
   - export IMAGE="$CONTAINER_NAME:$VERSION"
-  - echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin $DOCKER_REGISTRY
 
 stages:
   - build
@@ -18,7 +17,7 @@ build:
   stage: build
   tags: [ docker ]
   script:
-    - ./gradlew jib --image $IMAGE
+    - ./gradlew jib --image $IMAGE -Djib.to.auth.username=$DOCKER_USER -Djib.to.auth.password=$DOCKER_PASS
   only:
     - main
     - merge_requests
