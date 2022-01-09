@@ -13,26 +13,24 @@ import org.jose4j.jwt.consumer.JwtConsumerBuilder
 import org.jose4j.keys.resolvers.JwksVerificationKeyResolver
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.nio.file.Path
+import java.io.File
 import java.security.KeyPair
-import kotlin.io.path.Path
-import kotlin.io.path.nameWithoutExtension
-import kotlin.io.path.reader
 
 @Service
 class AuthService(
     private val appleIdService: AppleIdService,
     private val profileService: ProfileService,
-    @Value("\${jwks.certificatePath}")
+    @Value("\${jwks.certificateDirectory}")
     jwksCertificatePath: String
 ) {
     private val issuer = "bombastic.dev"
     private val audience = "dev.bombastic.app"
 
-    private val keys = Path(jwksCertificatePath).map { it.nameWithoutExtension to readKey(it) }
+    private val keys =
+        File(jwksCertificatePath).listFiles().map { it.nameWithoutExtension to readKey(it) }
 
-    private fun readKey(path: Path): KeyPair {
-        val parser = PEMParser(path.reader())
+    private fun readKey(file: File): KeyPair {
+        val parser = PEMParser(file.reader())
         val converter = JcaPEMKeyConverter()
         val keys = parser.readObject() as PEMKeyPair
 

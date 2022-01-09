@@ -1,1 +1,3 @@
 logging.level.reactor.netty.http.server.AccessLog: INFO
+apple.certificatePath: infra/kubernetes/certificates/certs/apple.p8
+jwks.certificateDirectory: infra/kubernetes/certificates/certs/jwks
