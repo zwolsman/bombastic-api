@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: api-app
-          image: bombastic-api
+          image: api-image
           ports:
             - containerPort: 8080
           readinessProbe:
