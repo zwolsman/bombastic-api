@@ -27,7 +27,7 @@ deploy:
   script:
     - kubectl version
     - kubectl config get-contexts
-    - cd infra/kubernetes/base
+    - cd infra/kubernetes/app
     - kustomize edit set image $IMAGE
     - kustomize build | kubectl apply -n bombastic -f -
     - kubectl rollout status deployment/api -n bombastic --timeout=10m

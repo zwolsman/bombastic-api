@@ -44,3 +44,15 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+          volumeMounts:
+            - mountPath: /app/certs
+              name: apple-certificate
+            - mountPath: /app/certs/jwks
+              name: jwk-certificates
+      volumes:
+        - name: apple-certificate
+          secret:
+            secretName: apple-certificate
+        - name: jwk-certificates
+          secret:
+            secretName: jwks-certificates
