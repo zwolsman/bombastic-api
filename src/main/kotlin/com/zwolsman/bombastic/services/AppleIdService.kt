@@ -12,16 +12,14 @@ import org.jose4j.jws.JsonWebSignature
 import org.jose4j.jwt.JwtClaims
 import org.jose4j.jwt.consumer.JwtConsumerBuilder
 import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import java.security.PrivateKey
+import kotlin.io.path.Path
+import kotlin.io.path.reader
 
 @Service
 class AppleIdService(
     private val config: AppleIdConfiguration,
-    @Value("classpath:apple/cert.p8")
-    private val applePrivateCert: Resource,
     private val repo: AppleIdRepository,
 ) {
 
@@ -34,7 +32,7 @@ class AppleIdService(
         .build()
 
     private val privateKey: PrivateKey by lazy {
-        val parser = PEMParser(applePrivateCert.inputStream.reader())
+        val parser = PEMParser(Path(config.certificatePath).reader())
         val converter = JcaPEMKeyConverter()
         val info = parser.readObject() as PrivateKeyInfo
         converter.getPrivateKey(info)

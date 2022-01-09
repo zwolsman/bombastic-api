@@ -6,6 +6,7 @@ spring:
 apple:
   keyId: REPLACE_ME
   teamId: REPLACE_ME
+  certificatePath: REPLACE_ME
   clientId: dev.bombastic.app
 
 

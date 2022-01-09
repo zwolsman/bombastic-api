@@ -5,4 +5,9 @@ import org.springframework.boot.context.properties.ConstructorBinding
 
 @ConfigurationProperties(prefix = "apple")
 @ConstructorBinding
-data class AppleIdConfiguration(val clientId: String, val teamId: String, val keyId: String)
+data class AppleIdConfiguration(
+    val clientId: String,
+    val teamId: String,
+    val keyId: String,
+    val certificatePath: String,
+)
