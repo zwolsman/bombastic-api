@@ -1,0 +1,19 @@
+before_script:
+  - export DOCKER_REGISTRY=$(([[ -n $DOCKER_REGISTRY ]] && echo $DOCKER_REGISTRY) || echo "docker.joell.dev")
+  - export NAME=$(([[ -n $NAME ]] && echo $NAME || echo $CI_PROJECT_NAME) | tr '[:upper:]' '[:lower:]')
+  - export NAMESPACE=$(([[ -n $NAMESPACE ]] && echo $NAMESPACE || echo $CI_PROJECT_NAMESPACE) | tr '[:upper:]' '[:lower:]')
+
+  - export CONTAINER_NAME=$DOCKER_REGISTRY/$NAMESPACE/$NAME
+
+  - export VERSION="$(git describe --long 2>/dev/null || echo $(git describe --abbrev=0 2>/dev/null || echo 0.0.0)-g$CI_COMMIT_SHORT_SHA)"
+  - export IMAGE="$CONTAINER_NAME:$VERSION"
+  - echo $DOCKER_PASS | docker login --username $DOCKER_USER --password-stdin $DOCKER_REGISTRY
+
+build:
+  image: openjdk:11
+  stage: build
+  script:
+    - ./gradlew jib --image $IMAGE
+  only:
+    - main
+    - merge_requests
