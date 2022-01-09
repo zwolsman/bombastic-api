@@ -44,6 +44,22 @@ spec:
               value: /app/certs/apple.p8
             - name: jwks.certificateDirectory
               value: /app/certs/jwks
+            - name: spring.r2dbc.password
+              valueFrom:
+                secretKeyRef:
+                  name: database-creds
+                  key: password
+            - name: apple.keyId
+              valueFrom:
+                secretKeyRef:
+                  name: apple-config
+                  key: teamId
+            - name: apple.teamId
+              valueFrom:
+                secretKeyRef:
+                  name: apple-config
+                  key: teamId
+
           volumeMounts:
             - mountPath: /app/certs
               name: apple-certificate
