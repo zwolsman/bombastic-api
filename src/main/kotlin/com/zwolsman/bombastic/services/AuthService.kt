@@ -10,41 +10,51 @@ import org.jose4j.jws.AlgorithmIdentifiers
 import org.jose4j.jws.JsonWebSignature
 import org.jose4j.jwt.JwtClaims
 import org.jose4j.jwt.consumer.JwtConsumerBuilder
+import org.jose4j.keys.resolvers.JwksVerificationKeyResolver
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
+import java.nio.file.Path
 import java.security.KeyPair
+import kotlin.io.path.Path
+import kotlin.io.path.nameWithoutExtension
+import kotlin.io.path.reader
 
 @Service
 class AuthService(
     private val appleIdService: AppleIdService,
     private val profileService: ProfileService,
-    @Value("classpath:certs/private.pem")
-    privateCert: Resource,
+    @Value("\${jwks.certificatePath}")
+    jwksCertificatePath: String
 ) {
     private val issuer = "bombastic.dev"
     private val audience = "dev.bombastic.app"
 
-    private val keys = run {
-        val parser = PEMParser(privateCert.inputStream.reader())
+    private val keys = Path(jwksCertificatePath).map { it.nameWithoutExtension to readKey(it) }
+
+    private fun readKey(path: Path): KeyPair {
+        val parser = PEMParser(path.reader())
         val converter = JcaPEMKeyConverter()
         val keys = parser.readObject() as PEMKeyPair
 
         val publicKey = converter.getPublicKey(keys.publicKeyInfo)
         val privateKey = converter.getPrivateKey(keys.privateKeyInfo)
 
-        KeyPair(publicKey, privateKey)
+        return KeyPair(publicKey, privateKey)
     }
 
-    private val rsaJsonWebKey = JsonWebKey.Factory.newJwk(keys.public).apply {
-        keyId = "key-id"
+    private val rsaJwks = keys.map { (name, key) ->
+        JsonWebKey.Factory.newJwk(key.public).apply {
+            keyId = name
+        }
     }
+
+    private val resolver = JwksVerificationKeyResolver(rsaJwks)
 
     private val jwtConsumer = JwtConsumerBuilder()
         .setRequireSubject()
         .setExpectedIssuer(issuer)
         .setExpectedAudience(audience)
-        .setVerificationKey(keys.public)
+        .setVerificationKeyResolver(resolver)
         .setJwsAlgorithmConstraints(
             AlgorithmConstraints.ConstraintType.PERMIT, AlgorithmIdentifiers.RSA_USING_SHA256
         )
@@ -57,13 +67,15 @@ class AuthService(
         claims.setAudience(audience)
         claims.setGeneratedJwtId()
         claims.setIssuedAtToNow()
-        claims.subject = profile.id.toString()
+        claims.subject = profile.id
 
         claims.setClaim("email", profile.email)
+
+        val (keyId, key) = keys.random()
         val jws = JsonWebSignature()
         jws.payload = claims.toJson()
-        jws.key = keys.private
-        jws.keyIdHeaderValue = rsaJsonWebKey.keyId
+        jws.key = key.private
+        jws.keyIdHeaderValue = keyId
         jws.algorithmHeaderValue = AlgorithmIdentifiers.RSA_USING_SHA256
 
         return jws.compactSerialization
