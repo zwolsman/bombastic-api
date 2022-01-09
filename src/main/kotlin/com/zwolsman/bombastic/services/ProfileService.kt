@@ -7,6 +7,7 @@ import com.zwolsman.bombastic.domain.PointOffer
 import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.repositories.ProfileRepository
 import kotlinx.coroutines.reactor.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -18,20 +19,28 @@ class ProfileService(private val repo: ProfileRepository) {
         appleRefreshToken: String,
         appleAccessToken: String
     ): Profile {
-        val profile = ProfileModel(
-            points = 1000,
-            name = name,
-            email = email,
-            gamesPlayed = 0,
-            pointsEarned = 0,
-            appleUserId = appleUserId,
-            appleRefreshToken = appleRefreshToken,
-            appleAccessToken = appleAccessToken,
-            balanceInEur = 0.0,
-        )
+        val model = when (val registeredModel = repo.findByAppleUserId(appleUserId).awaitSingleOrNull()) {
+            null -> ProfileModel(
+                points = 1000,
+                name = name,
+                email = email,
+                gamesPlayed = 0,
+                pointsEarned = 0,
+                appleUserId = appleUserId,
+                appleRefreshToken = appleRefreshToken,
+                appleAccessToken = appleAccessToken,
+                balanceInEur = 0.0,
+            )
+            else -> registeredModel.copy(
+                name = name,
+                email = email,
+                appleRefreshToken = appleRefreshToken,
+                appleAccessToken = appleAccessToken,
+            )
+        }
 
         return repo
-            .save(profile)
+            .save(model)
             .awaitSingle()
             .let(::Profile)
     }
