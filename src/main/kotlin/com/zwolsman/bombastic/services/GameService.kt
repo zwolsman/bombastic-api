@@ -17,6 +17,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
     @Transactional
     suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
+        require(initialBet >= 100) { "Minimum initial bet is 100 points" }
         val model = GameModel(
             ownerId = owner,
             initialBet = initialBet,
