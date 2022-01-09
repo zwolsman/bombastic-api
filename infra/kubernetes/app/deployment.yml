@@ -1,9 +1,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    app: api
-  namespace: bombastic
   name: api
 spec:
   replicas: 1
@@ -11,9 +8,6 @@ spec:
     matchLabels:
       app: api
   template:
-    metadata:
-      labels:
-        app: api
     spec:
       imagePullSecrets:
         - name: regcred
@@ -46,6 +40,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.name
+            - name: apple.certificatePath
+              value: /app/certs/apple.p8
+            - name: jwks.certificateDirectory
+              value: /app/certs/jwks
           volumeMounts:
             - mountPath: /app/certs
               name: apple-certificate
