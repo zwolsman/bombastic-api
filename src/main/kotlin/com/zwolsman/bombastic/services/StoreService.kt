@@ -1,12 +1,10 @@
-package com.zwolsman.bombastic.controllers.store
+package com.zwolsman.bombastic.services
 
 import com.zwolsman.bombastic.config.PayOutOffers
 import com.zwolsman.bombastic.config.PointsOffers
-import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.domain.Offer
 import com.zwolsman.bombastic.domain.PayOutOffer
 import com.zwolsman.bombastic.domain.Profile
-import com.zwolsman.bombastic.services.ProfileService
 import org.springframework.stereotype.Service
 
 @Service

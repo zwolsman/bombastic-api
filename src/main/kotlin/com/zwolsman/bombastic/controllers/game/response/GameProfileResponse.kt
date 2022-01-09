@@ -1,7 +1,7 @@
 package com.zwolsman.bombastic.controllers.game.response
 
 import com.fasterxml.jackson.annotation.JsonInclude
-import com.zwolsman.bombastic.controllers.profile.ProfileResponse
+import com.zwolsman.bombastic.controllers.profile.responses.ProfileResponse
 import com.zwolsman.bombastic.domain.Game
 import com.zwolsman.bombastic.domain.Profile
 

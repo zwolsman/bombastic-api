@@ -1,8 +1,9 @@
 package com.zwolsman.bombastic.controllers.store
 
-import com.zwolsman.bombastic.controllers.profile.ProfileResponse
+import com.zwolsman.bombastic.controllers.profile.responses.ProfileResponse
 import com.zwolsman.bombastic.controllers.store.response.OffersResponse
 import com.zwolsman.bombastic.domain.Profile
+import com.zwolsman.bombastic.services.StoreService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
