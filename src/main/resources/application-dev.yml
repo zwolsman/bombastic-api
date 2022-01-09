@@ -1,3 +1,9 @@
 logging.level.reactor.netty.http.server.AccessLog: INFO
 apple.certificatePath: infra/kubernetes/certificates/certs/apple.p8
 jwks.certificateDirectory: infra/kubernetes/certificates/certs/jwks
+
+spring:
+  r2dbc:
+    url: r2dbc:postgresql://localhost/postgres
+    username: postgres
+    password: password
