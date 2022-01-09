@@ -36,5 +36,6 @@ out/
 ### VS Code ###
 .vscode/
 
+certs
 *.p8
 *.pem
