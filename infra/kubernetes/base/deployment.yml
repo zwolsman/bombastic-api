@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: api
+  namespace: bombastic
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api-app
+          image: bombastic-api
+          ports:
+            - containerPort: 8080
+          readinessProbe:
+            failureThreshold: 2
+            initialDelaySeconds: 15
+            periodSeconds: 2
+            successThreshold: 2
+            httpGet:
+              port: 8080
+              path: /actuator/health
+            timeoutSeconds: 3
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 500Mi
+            requests:
+              cpu: 200m
+              memory: 500Mi
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1001
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
