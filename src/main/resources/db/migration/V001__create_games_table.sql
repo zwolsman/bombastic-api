@@ -1,10 +1,9 @@
 /*
  ID generator
  */
-CREATE SEQUENCE public.global_id_seq;
-ALTER SEQUENCE public.global_id_seq OWNER TO postgres;
+CREATE SEQUENCE global_id_seq;
 
-CREATE OR REPLACE FUNCTION public.id_generator()
+CREATE OR REPLACE FUNCTION id_generator()
     RETURNS bigint
     LANGUAGE 'plpgsql'
 AS
@@ -18,7 +17,7 @@ DECLARE
     shard_id   int    := 1;
     result     bigint := 0;
 BEGIN
-    SELECT nextval('public.global_id_seq') % 1024 INTO seq_id;
+    SELECT nextval('global_id_seq') % 1024 INTO seq_id;
 
     SELECT FLOOR(EXTRACT(EPOCH FROM clock_timestamp()) * 1000) INTO now_millis;
     result := (now_millis - our_epoch) << 23;
@@ -27,8 +26,6 @@ BEGIN
     return result;
 END;
 $BODY$;
-
-ALTER FUNCTION public.id_generator() OWNER TO postgres;
 
 /*
  TABLE
