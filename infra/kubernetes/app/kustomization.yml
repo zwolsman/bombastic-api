@@ -1,5 +1,8 @@
-resources:
-  - deployment.yml
-
+namespace: bombastic
 commonLabels:
   app: api
+
+resources:
+  - deployment.yml
+  - service.yml
+  - ingress.yml
