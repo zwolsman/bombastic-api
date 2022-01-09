@@ -40,13 +40,15 @@ class AuthService(
         return KeyPair(publicKey, privateKey)
     }
 
-    private val rsaJwks = keys.map { (name, key) ->
+    final val jsonWebKeys = keys.map { (name, key) ->
         JsonWebKey.Factory.newJwk(key.public).apply {
             keyId = name
+            algorithm = AlgorithmIdentifiers.RSA_USING_SHA256
+            use = "sig"
         }
     }
 
-    private val resolver = JwksVerificationKeyResolver(rsaJwks)
+    private val resolver = JwksVerificationKeyResolver(jsonWebKeys)
 
     private val jwtConsumer = JwtConsumerBuilder()
         .setRequireSubject()

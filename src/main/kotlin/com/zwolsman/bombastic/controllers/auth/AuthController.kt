@@ -1,6 +1,10 @@
 package com.zwolsman.bombastic.controllers.auth
 
+import com.zwolsman.bombastic.controllers.auth.response.AuthResponse
+import com.zwolsman.bombastic.controllers.auth.response.KeyResponse
+import com.zwolsman.bombastic.controllers.auth.response.KeysResponse
 import com.zwolsman.bombastic.services.AuthService
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -22,7 +26,12 @@ class AuthController(private val authService: AuthService) {
             .verify(payload.authCode, payload.identityToken)
             .let(::AuthResponse)
 
-    data class AuthResponse(val accessToken: String)
+    @GetMapping("/keys")
+    fun keys(): KeysResponse = authService
+        .jsonWebKeys
+        .map(::KeyResponse)
+        .let(::KeysResponse)
+
     data class SignUpPayload(val email: String, val fullName: String, val authCode: String, val identityToken: String)
     data class VerifyPayload(val authCode: String, val identityToken: String)
 }
