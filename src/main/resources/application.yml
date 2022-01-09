@@ -9,7 +9,6 @@ apple:
   certificatePath: REPLACE_ME
   clientId: dev.bombastic.app
 
-
 springfox:
   documentation:
     swagger-ui:

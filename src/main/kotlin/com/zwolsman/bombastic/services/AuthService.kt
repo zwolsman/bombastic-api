@@ -27,7 +27,10 @@ class AuthService(
     private val audience = "dev.bombastic.app"
 
     private val keys =
-        File(jwksCertificatePath).listFiles().map { it.nameWithoutExtension to readKey(it) }
+        File(jwksCertificatePath)
+            .listFiles()
+            .filter { it.isFile }
+            .map { it.nameWithoutExtension to readKey(it) }
 
     private fun readKey(file: File): KeyPair {
         val parser = PEMParser(file.reader())
