@@ -36,13 +36,13 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
     fun allGames(owner: String): Flow<Game> {
         return gameRepository
-            .findAllByOwnerIdOrderByIdDesc(ownerId = owner)
+            .findAllByOwnerIdAndDeletedIsFalseOrderByIdDesc(ownerId = owner)
             .map(::Game)
             .asFlow()
     }
 
     suspend fun byId(gameId: String): Game {
-        val model = gameRepository.findById(gameId).awaitSingleOrNull()
+        val model = gameRepository.findByIdAndDeletedIsFalse(gameId).awaitSingleOrNull()
         requireNotNull(model) { "Game not found" }
 
         return model.let(::Game)
@@ -84,6 +84,14 @@ class GameService(private val profileService: ProfileService, private val gameRe
         val profile = profileService.modifyPoints(id = owner, game.stake, game.earned)
 
         return game to profile
+    }
+
+    suspend fun delete(owner: String, gameId: String) {
+        val model = byId(gameId)
+            .requireOwner(owner)
+            .let { GameModel(it.copy(isDeleted = true)) }
+
+        gameRepository.save(model).awaitSingleOrNull()
     }
 
     private fun Game.requireOwner(ownerId: String) = apply { require(owner == ownerId) }

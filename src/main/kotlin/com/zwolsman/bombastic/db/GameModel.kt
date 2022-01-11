@@ -16,6 +16,7 @@ data class GameModel(
     var ownerId: String,
     var tiles: List<String> = emptyList(),
     var cashedOut: Boolean = false,
+    var deleted: Boolean = false,
 )
 
 fun GameModel(game: Game): GameModel {
@@ -26,6 +27,7 @@ fun GameModel(game: Game): GameModel {
         colorId = game.colorId,
         secret = game.secret,
         initialBet = game.initialBet,
-        cashedOut = game.state == Game.State.CASHED_OUT
+        cashedOut = game.state == Game.State.CASHED_OUT,
+        deleted = game.isDeleted,
     )
 }

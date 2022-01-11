@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -67,6 +68,12 @@ class GameController(private val gameService: GameService) {
         gameService
             .cashOut(owner = profile.id, gameId = id)
             .let(::GameProfileResponse)
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    suspend fun deleteGame(@PathVariable id: String, @AuthenticationPrincipal profile: Profile) =
+        gameService
+            .delete(owner = profile.id, gameId = id)
 
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

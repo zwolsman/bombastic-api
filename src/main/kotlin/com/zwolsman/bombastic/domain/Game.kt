@@ -17,7 +17,8 @@ fun Game(model: GameModel): Game {
             model.cashedOut -> Game.State.CASHED_OUT
             tiles.any { it is Bomb } -> Game.State.HIT_BOMB
             else -> Game.State.IN_GAME
-        }
+        },
+        isDeleted = model.deleted,
     )
 }
 
@@ -29,6 +30,7 @@ data class Game(
     val colorId: Int,
     val state: State,
     val secret: String,
+    val isDeleted: Boolean,
 ) {
     val stake = initialBet + tiles.filterIsInstance<Points>().sumOf { it.amount }
     val next = GameLogic.calculateNext(this)
