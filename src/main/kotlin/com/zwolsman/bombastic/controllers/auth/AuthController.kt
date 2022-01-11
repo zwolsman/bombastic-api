@@ -1,5 +1,7 @@
 package com.zwolsman.bombastic.controllers.auth
 
+import com.zwolsman.bombastic.controllers.auth.payload.SignUpPayload
+import com.zwolsman.bombastic.controllers.auth.payload.VerifyPayload
 import com.zwolsman.bombastic.controllers.auth.response.AuthResponse
 import com.zwolsman.bombastic.controllers.auth.response.KeyResponse
 import com.zwolsman.bombastic.controllers.auth.response.KeysResponse
@@ -15,13 +17,13 @@ import org.springframework.web.bind.annotation.RestController
 class AuthController(private val authService: AuthService) {
 
     @PostMapping("/sign-up")
-    suspend fun signUp(@RequestBody payload: SignUpPayload) =
+    suspend fun signUp(@RequestBody payload: SignUpPayload): AuthResponse =
         authService
             .signUp(payload.email, payload.fullName, payload.authCode, payload.identityToken)
             .let(::AuthResponse)
 
     @PostMapping("/verify")
-    suspend fun verify(@RequestBody payload: VerifyPayload) =
+    suspend fun verify(@RequestBody payload: VerifyPayload): AuthResponse =
         authService
             .verify(payload.authCode, payload.identityToken)
             .let(::AuthResponse)
@@ -31,7 +33,4 @@ class AuthController(private val authService: AuthService) {
         .jsonWebKeys
         .map(::KeyResponse)
         .let(::KeysResponse)
-
-    data class SignUpPayload(val email: String, val fullName: String, val authCode: String, val identityToken: String)
-    data class VerifyPayload(val authCode: String, val identityToken: String)
 }

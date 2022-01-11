@@ -1,5 +1,6 @@
 package com.zwolsman.bombastic.controllers.game
 
+import com.zwolsman.bombastic.controllers.game.payload.CreateGamePayload
 import com.zwolsman.bombastic.controllers.game.response.GameProfileResponse
 import com.zwolsman.bombastic.controllers.game.response.GameResponse
 import com.zwolsman.bombastic.controllers.game.response.GamesResponse
@@ -38,38 +39,34 @@ class GameController(private val gameService: GameService) {
     }
 
     @GetMapping("/{id}")
-    suspend fun game(@PathVariable id: String): GameResponse {
-        return gameService
+    suspend fun game(@PathVariable id: String): GameResponse =
+        gameService
             .byId(id)
             .let(::GameResponse)
-    }
 
     @GetMapping
-    suspend fun games(@AuthenticationPrincipal profile: Profile): GamesResponse {
-        return gameService
+    suspend fun games(@AuthenticationPrincipal profile: Profile): GamesResponse =
+        gameService
             .allGames(owner = profile.id)
             .map(::GameResponse)
             .toList()
             .let(::GamesResponse)
-    }
 
     @PutMapping("/{id}/guess")
     suspend fun guess(
         @PathVariable id: String,
         @RequestParam tileId: Int,
         @AuthenticationPrincipal profile: Profile
-    ): GameProfileResponse {
-        return gameService
+    ): GameProfileResponse =
+        gameService
             .guess(owner = profile.id, gameId = id, tileId)
             .let(::GameProfileResponse)
-    }
 
     @PutMapping("/{id}/cash-out")
-    suspend fun cashOut(@PathVariable id: String, @AuthenticationPrincipal profile: Profile): GameProfileResponse {
-        return gameService
+    suspend fun cashOut(@PathVariable id: String, @AuthenticationPrincipal profile: Profile): GameProfileResponse =
+        gameService
             .cashOut(owner = profile.id, gameId = id)
             .let(::GameProfileResponse)
-    }
 
     @ExceptionHandler(IllegalArgumentException::class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

@@ -16,16 +16,14 @@ import org.springframework.web.bind.annotation.RestController
 class StoreController(private val storeService: StoreService) {
 
     @GetMapping("/offers")
-    suspend fun offers(@AuthenticationPrincipal profile: Profile): OffersResponse {
-        return storeService
+    suspend fun offers(@AuthenticationPrincipal profile: Profile): OffersResponse =
+        storeService
             .personalOffers(profileId = profile.id)
             .let(::OffersResponse)
-    }
 
     @PostMapping("/offers/{offerId}/purchase")
-    suspend fun addPoints(@PathVariable offerId: String, @AuthenticationPrincipal profile: Profile): ProfileResponse {
-        return storeService
+    suspend fun addPoints(@PathVariable offerId: String, @AuthenticationPrincipal profile: Profile): ProfileResponse =
+        storeService
             .purchase(profileId = profile.id, offerId = offerId)
             .let(::ProfileResponse)
-    }
 }

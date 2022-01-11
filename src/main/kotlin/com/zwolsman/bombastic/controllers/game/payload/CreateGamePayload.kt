@@ -1,4 +1,4 @@
-package com.zwolsman.bombastic.controllers.game
+package com.zwolsman.bombastic.controllers.game.payload
 
 data class CreateGamePayload(
     val initialBet: Int,

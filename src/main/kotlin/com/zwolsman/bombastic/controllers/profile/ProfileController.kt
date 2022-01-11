@@ -14,15 +14,13 @@ import org.springframework.web.bind.annotation.RestController
 class ProfileController(private val profileService: ProfileService) {
 
     @GetMapping("/me")
-    suspend fun userProfile(@AuthenticationPrincipal profile: Profile): ProfileResponse {
-        return profile
+    suspend fun userProfile(@AuthenticationPrincipal profile: Profile): ProfileResponse =
+        profile
             .let(::ProfileResponse)
-    }
 
     @GetMapping("/{id}")
-    suspend fun byId(@PathVariable id: String): ProfileResponse {
-        return profileService
+    suspend fun byId(@PathVariable id: String): ProfileResponse =
+        profileService
             .findById(id)
             .let(::ProfileResponse)
-    }
 }

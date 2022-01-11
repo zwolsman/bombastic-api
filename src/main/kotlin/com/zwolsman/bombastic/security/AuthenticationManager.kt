@@ -19,4 +19,3 @@ class AuthenticationManager(private val authService: AuthService, private val pr
         return profile.map(::AuthenticatedProfile)
     }
 }
-
