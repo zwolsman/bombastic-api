@@ -3,6 +3,7 @@ package com.zwolsman.bombastic.services
 import com.zwolsman.bombastic.db.GameModel
 import com.zwolsman.bombastic.domain.Game
 import com.zwolsman.bombastic.domain.Profile
+import com.zwolsman.bombastic.helpers.validate
 import com.zwolsman.bombastic.logic.GameLogic
 import com.zwolsman.bombastic.repositories.GameRepository
 import kotlinx.coroutines.flow.Flow
@@ -11,13 +12,14 @@ import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.security.access.AccessDeniedException as SecurityAccessDeniedException
 
 @Service
 class GameService(private val profileService: ProfileService, private val gameRepository: GameRepository) {
 
     @Transactional
     suspend fun create(owner: String, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
-        require(initialBet >= 100) { "Minimum initial bet is 100 points" }
+        validate(initialBet >= 100) { IllegalArgumentException("Minimum initial bet is 100 points") }
         val model = GameModel(
             ownerId = owner,
             initialBet = initialBet,
@@ -43,7 +45,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
     suspend fun byId(gameId: String): Game {
         val model = gameRepository.findByIdAndDeletedIsFalse(gameId).awaitSingleOrNull()
-        requireNotNull(model) { "Game not found" }
+        validate(model != null) { Exception("Game not found") } // TODO: proper exception
 
         return model.let(::Game)
     }
@@ -51,7 +53,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
     @Transactional
     suspend fun guess(owner: String, gameId: String, tileId: Int): Pair<Game, Profile?> {
         val model = byId(gameId)
-            .requireOwner(owner)
+            .validateIsOwner(owner)
             .let { GameLogic.guess(it, tileId) }
             .let(::GameModel)
 
@@ -72,7 +74,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
     @Transactional
     suspend fun cashOut(owner: String, gameId: String): Pair<Game, Profile> {
         val model = byId(gameId)
-            .requireOwner(owner)
+            .validateIsOwner(owner)
             .let { GameLogic.cashOut(it) }
             .let(::GameModel)
 
@@ -88,13 +90,16 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
     suspend fun delete(owner: String, gameId: String) {
         val model = byId(gameId)
-            .requireOwner(owner)
+            .validateIsOwner(owner)
             .let { GameModel(it.copy(isDeleted = true)) }
 
         gameRepository.save(model).awaitSingleOrNull()
     }
 
-    private fun Game.requireOwner(ownerId: String) = apply { require(owner == ownerId) }
+    private fun Game.validateIsOwner(ownerId: String) = apply {
+        validate(owner == ownerId) { SecurityAccessDeniedException("Denied") }
+    }
+
     private val Game.earned: Int
         get() = stake - initialBet
 }
