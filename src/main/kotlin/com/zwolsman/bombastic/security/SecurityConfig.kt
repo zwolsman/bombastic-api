@@ -1,6 +1,7 @@
 package com.zwolsman.bombastic.security
 
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
@@ -16,13 +17,16 @@ import org.springframework.security.web.server.context.ServerSecurityContextRepo
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.reactive.CorsWebFilter
 import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource
+import org.zalando.problem.spring.webflux.advice.security.SecurityProblemSupport
 import reactor.core.publisher.Mono
 
 @EnableWebFluxSecurity
 @EnableReactiveMethodSecurity
+@Import(SecurityProblemSupport::class)
 class SecurityConfig(
     private val authenticationManager: ReactiveAuthenticationManager,
-    private val securityContextRepository: ServerSecurityContextRepository
+    private val securityContextRepository: ServerSecurityContextRepository,
+    private val problemSupport: SecurityProblemSupport,
 ) {
 
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -30,15 +34,9 @@ class SecurityConfig(
     fun apiHttpSecurity(http: ServerHttpSecurity): SecurityWebFilterChain {
         return http
             .exceptionHandling()
-            .authenticationEntryPoint { exchange, _ ->
-                Mono.fromRunnable {
-                    exchange.response.statusCode = HttpStatus.UNAUTHORIZED
-                }
-            }.accessDeniedHandler { exchange, _ ->
-                Mono.fromRunnable {
-                    exchange.response.statusCode = HttpStatus.FORBIDDEN
-                }
-            }.and()
+            .authenticationEntryPoint(problemSupport)
+            .accessDeniedHandler(problemSupport)
+            .and()
             .csrf().disable()
             .formLogin().disable()
             .httpBasic().disable()

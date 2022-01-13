@@ -11,7 +11,6 @@ import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -74,10 +73,4 @@ class GameController(private val gameService: GameService) {
     suspend fun deleteGame(@PathVariable id: String, @AuthenticationPrincipal profile: Profile) =
         gameService
             .delete(owner = profile.id, gameId = id)
-
-    @ExceptionHandler(IllegalArgumentException::class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    fun illegalArgument(ex: IllegalArgumentException): String {
-        return ex.message!!
-    }
 }
