@@ -34,7 +34,7 @@ class GameController(private val gameService: GameService) {
         val (initialBet, bombs, colorId) = payload
 
         return gameService
-            .create(owner = profile.id, initialBet, bombs, colorId)
+            .create(profile, initialBet, bombs, colorId)
             .let(::GameProfileResponse)
     }
 
@@ -49,7 +49,6 @@ class GameController(private val gameService: GameService) {
         gameService
             .allGames(owner = profile.id)
             .map(::GameResponse)
-            .toList()
             .let(::GamesResponse)
 
     @PutMapping("/{id}/guess")
