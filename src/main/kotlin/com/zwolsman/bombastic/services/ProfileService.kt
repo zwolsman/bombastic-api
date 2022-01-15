@@ -1,13 +1,11 @@
 package com.zwolsman.bombastic.services
 
-import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.domain.Offer
 import com.zwolsman.bombastic.domain.PayOutOffer
 import com.zwolsman.bombastic.domain.PointOffer
 import com.zwolsman.bombastic.domain.Profile
+import com.zwolsman.bombastic.helpers.validate
 import com.zwolsman.bombastic.repositories.ProfileRepository
-import kotlinx.coroutines.reactor.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -19,9 +17,10 @@ class ProfileService(private val repo: ProfileRepository) {
         appleRefreshToken: String,
         appleAccessToken: String
     ): Profile {
-        val model = when (val registeredModel = repo.findByAppleUserId(appleUserId).awaitSingleOrNull()) {
-            null -> ProfileModel(
-                points = 1000,
+        val profile = when (val appleUserProfile = repo.findByAppleUserId(appleUserId)) {
+            null -> Profile(
+                id = null,
+                points = 0,
                 name = name,
                 email = email,
                 gamesPlayed = 0,
@@ -31,7 +30,7 @@ class ProfileService(private val repo: ProfileRepository) {
                 appleAccessToken = appleAccessToken,
                 balanceInEur = 0.0,
             )
-            else -> registeredModel.copy(
+            else -> appleUserProfile.copy(
                 name = name,
                 email = email,
                 appleRefreshToken = appleRefreshToken,
@@ -40,72 +39,62 @@ class ProfileService(private val repo: ProfileRepository) {
         }
 
         return repo
-            .save(model)
-            .awaitSingle()
-            .let(::Profile)
+            .save(profile)
     }
 
-    suspend fun findByAppleUserId(appleUserId: String): Profile {
+    suspend fun findByAppleUserId(appleUserId: String): Profile =
+        repo
+            .findByAppleUserId(appleUserId) ?: throw Exception("Profile not found")
+
+    suspend fun findById(id: String): Profile =
+        repo.findById(id) ?: throw Exception("Profile not found")
+
+    suspend fun modifyPoints(profile: Profile, points: Int, earned: Int): Profile {
+        validate(points >= 0) { IllegalArgumentException("Points should be >= 0") }
+        validate(earned >= 0) { IllegalArgumentException("Earned should be >= 0") }
+
+        val updatedProfile = profile.copy(
+            points = profile.points + points,
+            pointsEarned = profile.pointsEarned + earned,
+        )
         return repo
-            .findByAppleUserId(appleUserId)
-            .awaitSingle()
-            .let(::Profile)
+            .save(updatedProfile)
     }
 
-    suspend fun findById(id: String): Profile {
-        return findModelById(id)
-            .let(::Profile)
-    }
-
-    private suspend fun findModelById(id: String): ProfileModel {
-        return repo
-            .findById(id.toLong())
-            .awaitSingle()
-    }
-
-    suspend fun modifyPoints(id: String, points: Int, earned: Int): Profile {
-        require(points >= 0)
-        require(earned >= 0)
-
-        val model = findModelById(id)
-        model.points += points
-        model.pointsEarned += earned
+    suspend fun createGame(profile: Profile, initialBet: Int): Profile {
+        val updatedProfile = profile.copy(
+            points = profile.points - initialBet,
+            gamesPlayed = profile.gamesPlayed + 1,
+        )
 
         return repo
-            .save(model)
-            .awaitSingle()
-            .let(::Profile)
+            .save(updatedProfile)
     }
 
-    suspend fun createGame(id: String, initialBet: Int): Profile {
-        val model = findModelById(id)
-        model.points -= initialBet
-        model.gamesPlayed += 1
-
-        return repo
-            .save(model)
-            .awaitSingle()
-            .let(::Profile)
-    }
-
-    suspend fun redeemOffer(id: String, offer: Offer): Profile {
-        val model = findModelById(id)
-
-        when (offer) {
+    suspend fun redeemOffer(profile: Profile, offer: Offer): Profile {
+        val updatedProfile = when (offer) {
             is PayOutOffer -> {
-                model.balanceInEur += offer.reward
-                model.points -= offer.price.toInt()
-                require(model.points >= 0) { "Not enough points to cash out" }
+                validate(profile.points >= 0) { IllegalStateException("Not enough points to cash out") }
+                profile.redeemOffer(offer)
             }
             is PointOffer -> {
-                model.balanceInEur -= offer.price
-                model.points += offer.reward.toInt()
+                profile.redeemOffer(offer)
             }
         }
 
         return repo
-            .save(model)
-            .awaitSingle()
-            .let(::Profile)
+            .save(updatedProfile)
     }
+
+    private fun Profile.redeemOffer(offer: PayOutOffer) =
+        copy(
+            balanceInEur = balanceInEur + offer.reward,
+            points = points - offer.price.toInt(),
+        )
+
+    private fun Profile.redeemOffer(offer: PointOffer) =
+        copy(
+            balanceInEur = balanceInEur - offer.price,
+            points = points + offer.reward.toInt(),
+        )
 }
