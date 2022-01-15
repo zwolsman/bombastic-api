@@ -16,6 +16,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
     suspend fun create(profile: Profile, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
         validate(initialBet >= 100) { IllegalArgumentException("Minimum initial bet is 100 points") }
         validate(initialBet <= profile.points) { IllegalArgumentException("Not enough points") }
+        validate(profile.id != null) { IllegalStateException("No ID for profile") }
 
         val newGame = Game(
             id = null,
@@ -30,15 +31,17 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
         val game = gameRepository
             .save(newGame)
-        val profile = profileService
-            .createGame(id = profile.id, initialBet)
+        val updatedProfile = profileService
+            .createGame(profile, initialBet)
 
-        return game to profile
+        return game to updatedProfile
     }
 
-    suspend fun allGames(owner: String): List<Game> {
+    suspend fun allGames(profile: Profile): List<Game> {
+        validate(profile.id != null) { IllegalStateException("No ID for profile") }
+
         return gameRepository
-            .findAll(ownerId = owner)
+            .findAll(ownerId = profile.id)
     }
 
     suspend fun byId(gameId: String): Game {
@@ -49,43 +52,44 @@ class GameService(private val profileService: ProfileService, private val gameRe
     }
 
     @Transactional
-    suspend fun guess(owner: String, gameId: String, tileId: Int): Pair<Game, Profile?> {
+    suspend fun guess(profile: Profile, gameId: String, tileId: Int): Pair<Game, Profile?> {
         val game = byId(gameId)
-            .validateIsOwner(owner)
+            .validateIsOwner(profile)
             .let { GameLogic.guess(it, tileId) }
             .let { gameRepository.save(it) }
 
         // Game has been automatically cashed out because there are no moves left anymore
-        val profile = if (game.state == Game.State.CASHED_OUT)
-            profileService.modifyPoints(id = owner, game.stake, game.earned)
+        val updatedProfile = if (game.state == Game.State.CASHED_OUT)
+            profileService.modifyPoints(profile, game.stake, game.earned)
         else
             null
 
-        return game to profile
+        return game to updatedProfile
     }
 
     @Transactional
-    suspend fun cashOut(owner: String, gameId: String): Pair<Game, Profile> {
+    suspend fun cashOut(profile: Profile, gameId: String): Pair<Game, Profile> {
         val game = byId(gameId)
-            .validateIsOwner(owner)
+            .validateIsOwner(profile)
             .let { GameLogic.cashOut(it) }
             .let { gameRepository.save(it) }
 
-        val profile = profileService.modifyPoints(id = owner, game.stake, game.earned)
+        val updatedProfile = profileService
+            .modifyPoints(profile, game.stake, game.earned)
 
-        return game to profile
+        return game to updatedProfile
     }
 
-    suspend fun delete(owner: String, gameId: String) {
+    suspend fun delete(profile: Profile, gameId: String) {
         val game = byId(gameId)
-            .validateIsOwner(owner)
+            .validateIsOwner(profile)
             .copy(isDeleted = true)
 
         gameRepository.save(game)
     }
 
-    private fun Game.validateIsOwner(ownerId: String) = apply {
-        validate(owner == ownerId) { SecurityAccessDeniedException("Denied") }
+    private fun Game.validateIsOwner(profile: Profile) = apply {
+        validate(owner == profile.id) { SecurityAccessDeniedException("Denied") }
     }
 
     private val Game.earned: Int

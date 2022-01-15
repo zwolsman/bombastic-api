@@ -47,7 +47,7 @@ class GameController(private val gameService: GameService) {
     @GetMapping
     suspend fun games(@AuthenticationPrincipal profile: Profile): GamesResponse =
         gameService
-            .allGames(owner = profile.id)
+            .allGames(profile)
             .map(::GameResponse)
             .let(::GamesResponse)
 
@@ -58,18 +58,18 @@ class GameController(private val gameService: GameService) {
         @AuthenticationPrincipal profile: Profile
     ): GameProfileResponse =
         gameService
-            .guess(owner = profile.id, gameId = id, tileId)
+            .guess(profile, gameId = id, tileId)
             .let(::GameProfileResponse)
 
     @PutMapping("/{id}/cash-out")
     suspend fun cashOut(@PathVariable id: String, @AuthenticationPrincipal profile: Profile): GameProfileResponse =
         gameService
-            .cashOut(owner = profile.id, gameId = id)
+            .cashOut(profile, gameId = id)
             .let(::GameProfileResponse)
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     suspend fun deleteGame(@PathVariable id: String, @AuthenticationPrincipal profile: Profile) =
         gameService
-            .delete(owner = profile.id, gameId = id)
+            .delete(profile, gameId = id)
 }

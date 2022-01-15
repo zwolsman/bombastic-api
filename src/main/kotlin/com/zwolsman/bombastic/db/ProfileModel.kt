@@ -1,5 +1,6 @@
 package com.zwolsman.bombastic.db
 
+import com.zwolsman.bombastic.domain.Profile
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Table
 
@@ -18,3 +19,17 @@ data class ProfileModel(
     var appleRefreshToken: String? = null,
     var appleAccessToken: String? = null,
 )
+
+fun ProfileModel(profile: Profile) =
+    ProfileModel(
+        points = profile.points,
+        name = profile.name,
+        email = profile.email,
+        gamesPlayed = profile.gamesPlayed,
+        pointsEarned = profile.pointsEarned,
+        balanceInEur = profile.balanceInEur,
+        id = profile.id?.toLongOrNull(),
+        appleUserId = profile.appleUserId,
+        appleRefreshToken = profile.appleRefreshToken,
+        appleAccessToken = profile.appleAccessToken,
+    )
