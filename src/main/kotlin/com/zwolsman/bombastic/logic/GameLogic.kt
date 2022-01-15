@@ -4,6 +4,7 @@ import com.zwolsman.bombastic.domain.Bomb
 import com.zwolsman.bombastic.domain.Game
 import com.zwolsman.bombastic.domain.Points
 import com.zwolsman.bombastic.domain.Tile
+import com.zwolsman.bombastic.helpers.validate
 import java.security.SecureRandom
 import kotlin.math.floor
 
@@ -15,9 +16,9 @@ object GameLogic {
     private const val alphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     fun guess(game: Game, tileId: Int): Game {
-        require(game.state == Game.State.IN_GAME) { "Game is already finished" }
-        require(tileId in tileRange) { "Tile should be in the game" }
-        require(tileId !in game.tiles.map(Tile::id)) { "Tile is already guessed" }
+        validate(game.state == Game.State.IN_GAME) { IllegalStateException("Game is already finished") }
+        validate(tileId in tileRange) { IllegalArgumentException("Tile should be in the game") }
+        validate(tileId !in game.tiles.map(Tile::id)) { IllegalArgumentException("Tile is already guessed") }
 
         val didHitBomb = tileId in game.bombs
         if (didHitBomb) {
@@ -27,7 +28,7 @@ object GameLogic {
             return game.hitBomb(tiles)
         }
 
-        requireNotNull(game.next)
+        validate(game.next != null) { IllegalStateException("Could not calculate next") }
         val points = Points(tileId, game.next)
 
         if (game.tiles.size + game.bombs.size + 1 == tileRange.count()) {
@@ -47,7 +48,7 @@ object GameLogic {
     }
 
     fun cashOut(game: Game): Game {
-        require(game.state == Game.State.IN_GAME) { "Game is already finished" }
+        validate(game.state == Game.State.IN_GAME) { IllegalStateException("Game is already finished") }
         return game.copy(
             state = Game.State.CASHED_OUT,
             tiles = game.tiles + game.bombs.map { Bomb(it, false) }
@@ -84,7 +85,7 @@ object GameLogic {
             .joinToString(separator = "")
 
     private fun generateBombs(amount: Int): Set<Int> {
-        require(amount in allowedBombAmounts) { "Allowed amounts of bombs: ${allowedBombAmounts.joinToString()}" }
+        validate(amount in allowedBombAmounts) { IllegalArgumentException("Allowed amounts of bombs: ${allowedBombAmounts.joinToString()}") }
 
         return generateSequence { tileRange.random(rng) }
             .distinct()
