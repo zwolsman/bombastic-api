@@ -14,20 +14,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
     @Transactional
     suspend fun create(profile: Profile, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
-        validate(initialBet >= 100) { IllegalArgumentException("Minimum initial bet is 100 points") }
-        validate(initialBet <= profile.points) { IllegalArgumentException("Not enough points") }
-        validate(profile.id != null) { IllegalStateException("No ID for profile") }
-
-        val newGame = Game(
-            id = null,
-            owner = profile.id,
-            tiles = emptyList(),
-            initialBet = initialBet,
-            colorId = colorId,
-            state = Game.State.IN_GAME,
-            secret = GameLogic.generateSecret(amountOfBombs),
-            isDeleted = false,
-        )
+        val newGame = GameLogic.createGame(profile, initialBet, amountOfBombs, colorId)
 
         val game = gameRepository
             .save(newGame)
