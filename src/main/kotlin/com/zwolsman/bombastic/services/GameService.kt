@@ -10,27 +10,19 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.security.access.AccessDeniedException as SecurityAccessDeniedException
 
 @Service
-class GameService(private val profileService: ProfileService, private val gameRepository: GameRepository) {
+class GameService(
+    private val profileService: ProfileService,
+    private val gameRepository: GameRepository,
+    private val gameLogic: GameLogic,
+) {
 
     @Transactional
     suspend fun create(profile: Profile, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
-        validate(initialBet >= 100) { IllegalArgumentException("Minimum initial bet is 100 points") }
-        validate(initialBet <= profile.points) { IllegalArgumentException("Not enough points") }
-        validate(profile.id != null) { IllegalStateException("No ID for profile") }
-
-        val newGame = Game(
-            id = null,
-            owner = profile.id,
-            tiles = emptyList(),
-            initialBet = initialBet,
-            colorId = colorId,
-            state = Game.State.IN_GAME,
-            secret = GameLogic.generateSecret(amountOfBombs),
-            isDeleted = false,
-        )
+        val newGame = gameLogic.createGame(profile, initialBet, amountOfBombs, colorId)
 
         val game = gameRepository
             .save(newGame)
+
         val updatedProfile = profileService
             .createGame(profile, initialBet)
 
@@ -55,7 +47,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
     suspend fun guess(profile: Profile, gameId: String, tileId: Int): Pair<Game, Profile?> {
         val game = byId(gameId)
             .validateIsOwner(profile)
-            .let { GameLogic.guess(it, tileId) }
+            .let { gameLogic.guess(it, tileId) }
             .let { gameRepository.save(it) }
 
         // Game has been automatically cashed out because there are no moves left anymore
@@ -71,7 +63,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
     suspend fun cashOut(profile: Profile, gameId: String): Pair<Game, Profile> {
         val game = byId(gameId)
             .validateIsOwner(profile)
-            .let { GameLogic.cashOut(it) }
+            .let { gameLogic.cashOut(it) }
             .let { gameRepository.save(it) }
 
         val updatedProfile = profileService

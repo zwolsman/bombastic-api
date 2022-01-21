@@ -9,6 +9,7 @@ import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Repository
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -32,10 +33,12 @@ class GameRepository(private val db: GameDatabaseRepository) {
             .map(::Game)
             .toList()
 
-    suspend fun save(game: Game): Game =
-        game
+    @Transactional
+    suspend fun save(game: Game): Game {
+        return game
             .let(::GameModel)
             .let(db::save)
             .awaitFirst()
             .let(::Game)
+    }
 }
