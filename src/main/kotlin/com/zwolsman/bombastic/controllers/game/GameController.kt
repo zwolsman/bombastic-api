@@ -7,7 +7,6 @@ import com.zwolsman.bombastic.controllers.game.response.GamesResponse
 import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.services.GameService
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping

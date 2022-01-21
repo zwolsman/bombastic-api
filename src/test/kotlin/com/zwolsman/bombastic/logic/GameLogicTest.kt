@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito.mock
-import java.util.UUID
 
 internal class GameLogicTest {
     private val mockGameRepository = mock(GameRepository::class.java)
