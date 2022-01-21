@@ -24,7 +24,7 @@ class PayOutOffer(id: String, name: String, price: Int) : Offer("pay-out-$id", n
 
 class PointOffer(id: String, name: String, games: Int, x: Double) : Offer("points-$id", name) {
     override val currency = Currency.MONEY
-    private val multiplier = 1 + (GameLogic.houseEdge - x)
+    private val multiplier = 1 + (GameLogic.HOUSE_EDGE - x)
     private val basePoints = pointsPerGame * games
     val bonus = floor((multiplier * basePoints) - basePoints)
 
