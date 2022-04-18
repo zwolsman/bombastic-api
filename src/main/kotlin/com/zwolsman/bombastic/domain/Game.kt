@@ -26,7 +26,7 @@ data class Game(
     val id: Long?,
     val owner: String,
     val tiles: List<Tile>,
-    val initialBet: Int,
+    val initialBet: Long,
     val colorId: Int,
     val state: State,
     val secret: String,

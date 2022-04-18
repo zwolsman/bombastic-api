@@ -55,7 +55,7 @@ object GameLogic {
         )
     }
 
-    fun calculateNext(game: Game): Int? {
+    fun calculateNext(game: Game): Long? {
         val tiles = tileRange.count().toDouble()
         val guessedTiles = game.tiles.filterIsInstance<Points>().size
         val bombs = game.bombs.size
@@ -66,7 +66,7 @@ object GameLogic {
 
         return when (multiplier) {
             Double.POSITIVE_INFINITY -> null
-            else -> floor(game.stake * multiplier).toInt() - game.stake
+            else -> floor(game.stake * multiplier).toLong() - game.stake
         }
     }
 

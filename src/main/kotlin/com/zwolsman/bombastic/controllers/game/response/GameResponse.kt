@@ -8,14 +8,14 @@ import java.security.MessageDigest
 class GameResponse(
     override val id: String,
     override val tiles: List<Tile>,
-    override val stake: Int,
-    override val next: Int?,
+    override val stake: Long,
+    override val next: Long?,
     override val multiplier: Double,
     override val colorId: Int,
     override val state: Game.State,
     override val secret: String,
     override var bombs: Int,
-    override var initialBet: Int,
+    override var initialBet: Long,
     override val plain: String?,
 ) : BaseGameResponse
 

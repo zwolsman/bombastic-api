@@ -13,9 +13,9 @@ import org.springframework.security.access.AccessDeniedException as SecurityAcce
 class GameService(private val profileService: ProfileService, private val gameRepository: GameRepository) {
 
     @Transactional
-    suspend fun create(profile: Profile, initialBet: Int, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
+    suspend fun create(profile: Profile, initialBet: Long, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
         validate(initialBet >= 100) { IllegalArgumentException("Minimum initial bet is 100 points") }
-        validate(initialBet <= profile.points) { IllegalArgumentException("Not enough points") }
+        validate(initialBet <= profile.bits) { IllegalArgumentException("Not enough points") }
         validate(profile.id != null) { IllegalStateException("No ID for profile") }
 
         val newGame = Game(
@@ -60,7 +60,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
         // Game has been automatically cashed out because there are no moves left anymore
         val updatedProfile = if (game.state == Game.State.CASHED_OUT)
-            profileService.modifyPoints(profile, game.stake, game.earned)
+            profileService.modifyBits(profile, game.stake, game.earned)
         else
             null
 
@@ -75,7 +75,7 @@ class GameService(private val profileService: ProfileService, private val gameRe
             .let { gameRepository.save(it) }
 
         val updatedProfile = profileService
-            .modifyPoints(profile, game.stake, game.earned)
+            .modifyBits(profile, game.stake, game.earned)
 
         return game to updatedProfile
     }
@@ -92,6 +92,6 @@ class GameService(private val profileService: ProfileService, private val gameRe
         validate(owner == profile.id) { SecurityAccessDeniedException("Denied") }
     }
 
-    private val Game.earned: Int
+    private val Game.earned: Long
         get() = stake - initialBet
 }

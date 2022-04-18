@@ -7,7 +7,7 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table("games")
 data class GameModel(
-    var initialBet: Int,
+    var initialBet: Long,
     var colorId: Int,
     var secret: String,
 
