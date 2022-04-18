@@ -10,6 +10,7 @@ data class Profile(
     val gamesPlayed: Int,
     val pointsEarned: Int,
     val balanceInEur: Double,
+    val address: String?,
 
     val appleUserId: String? = null,
     val appleRefreshToken: String? = null,
@@ -24,4 +25,5 @@ fun Profile(model: ProfileModel): Profile = Profile(
     gamesPlayed = model.gamesPlayed,
     pointsEarned = model.pointsEarned,
     balanceInEur = model.balanceInEur,
+    address = model.address,
 )

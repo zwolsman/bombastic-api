@@ -11,6 +11,7 @@ import reactor.core.publisher.Mono
 @Repository
 interface ProfileDatabaseRepository : ReactiveCrudRepository<ProfileModel, Long> {
     fun findByAppleUserId(appleUserId: String): Mono<ProfileModel>
+    fun findByAddress(address: String): Mono<ProfileModel>
 }
 
 @Repository
@@ -25,6 +26,12 @@ class ProfileRepository(private val db: ProfileDatabaseRepository) {
     suspend fun findByAppleUserId(appleUserId: String): Profile? =
         db
             .findByAppleUserId(appleUserId)
+            .awaitFirstOrNull()
+            ?.let(::Profile)
+
+    suspend fun findByAddress(address: String): Profile? =
+        db
+            .findByAddress(address)
             .awaitFirstOrNull()
             ?.let(::Profile)
 
