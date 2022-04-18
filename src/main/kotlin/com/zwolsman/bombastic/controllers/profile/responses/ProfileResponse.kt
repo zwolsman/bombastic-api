@@ -4,18 +4,18 @@ import com.zwolsman.bombastic.domain.Profile
 
 data class ProfileResponse(
     val name: String,
-    val points: Int,
+    val bits: Long,
     val games: Int,
-    val totalEarnings: Int,
+    val bitsEarned: Long,
     val link: String,
-    val balanceInEur: Double,
+    val address: String,
 )
 
 fun ProfileResponse(profile: Profile) = ProfileResponse(
     profile.name,
-    profile.points,
+    profile.bits,
     profile.gamesPlayed,
-    profile.pointsEarned,
+    profile.bitsEarned,
     "https://bombastic.io/u/${profile.id}",
-    profile.balanceInEur,
+    profile.address,
 )

@@ -1,8 +1,5 @@
 package com.zwolsman.bombastic.services
 
-import com.zwolsman.bombastic.domain.Offer
-import com.zwolsman.bombastic.domain.PayOutOffer
-import com.zwolsman.bombastic.domain.PointOffer
 import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.helpers.validate
 import com.zwolsman.bombastic.repositories.ProfileRepository
@@ -24,15 +21,14 @@ class ProfileService(private val repo: ProfileRepository, private val wallet: Wa
         val profile = when (val appleUserProfile = repo.findByAppleUserId(appleUserId)) {
             null -> Profile(
                 id = null,
-                points = 0,
+                bits = 0,
                 name = name,
                 email = email,
                 gamesPlayed = 0,
-                pointsEarned = 0,
+                bitsEarned = 0,
                 appleUserId = appleUserId,
                 appleRefreshToken = appleRefreshToken,
                 appleAccessToken = appleAccessToken,
-                balanceInEur = 0.0,
                 address = wallet.freshReceiveAddress().toString(),
             )
             else -> appleUserProfile.copy(
@@ -48,27 +44,26 @@ class ProfileService(private val repo: ProfileRepository, private val wallet: Wa
     }
 
     suspend fun findByAppleUserId(appleUserId: String): Profile =
-        repo
-            .findByAppleUserId(appleUserId) ?: throw Exception("Profile not found")
+        repo.findByAppleUserId(appleUserId) ?: throw Exception("Profile not found")
 
     suspend fun findById(id: String): Profile =
         repo.findById(id) ?: throw Exception("Profile not found")
 
-    suspend fun modifyPoints(profile: Profile, points: Int, earned: Int): Profile {
-        validate(points >= 0) { IllegalArgumentException("Points should be >= 0") }
+    suspend fun modifyBits(profile: Profile, bits: Long, earned: Long): Profile {
+        validate(bits >= 0) { IllegalArgumentException("Bits should be >= 0") }
         validate(earned >= 0) { IllegalArgumentException("Earned should be >= 0") }
 
         val updatedProfile = profile.copy(
-            points = profile.points + points,
-            pointsEarned = profile.pointsEarned + earned,
+            bits = profile.bits + bits,
+            bitsEarned = profile.bitsEarned + earned,
         )
         return repo
             .save(updatedProfile)
     }
 
-    suspend fun createGame(profile: Profile, initialBet: Int): Profile {
+    suspend fun createGame(profile: Profile, initialBet: Long): Profile {
         val updatedProfile = profile.copy(
-            points = profile.points - initialBet,
+            bits = profile.bits - initialBet,
             gamesPlayed = profile.gamesPlayed + 1,
         )
 
@@ -76,42 +71,14 @@ class ProfileService(private val repo: ProfileRepository, private val wallet: Wa
             .save(updatedProfile)
     }
 
-    suspend fun redeemOffer(profile: Profile, offer: Offer): Profile {
-        val updatedProfile = when (offer) {
-            is PayOutOffer -> {
-                validate(profile.points >= 0) { IllegalStateException("Not enough points to cash out") }
-                profile.redeemOffer(offer)
-            }
-            is PointOffer -> {
-                profile.redeemOffer(offer)
-            }
-        }
-
-        return repo
-            .save(updatedProfile)
-    }
-
-    private fun Profile.redeemOffer(offer: PayOutOffer) =
-        copy(
-            balanceInEur = balanceInEur + offer.reward,
-            points = points - offer.price.toInt(),
-        )
-
-    private fun Profile.redeemOffer(offer: PointOffer) =
-        copy(
-            balanceInEur = balanceInEur - offer.price,
-            points = points + offer.reward.toInt(),
-        )
-
     suspend fun addBits(address: String, bits: Long) {
         val profile = repo.findByAddress(address) ?: run {
             log.warn("No profile found associated with $address")
             return
         }
 
-        val amount = bits.toInt() // TODO fix this
         log.info("Redeemed $bits bits for profile id ${profile.id} (${profile.name})")
-        val updatedProfile = profile.copy(points = profile.points + amount)
+        val updatedProfile = profile.copy(bits = profile.bits + bits)
 
         repo.save(updatedProfile)
     }

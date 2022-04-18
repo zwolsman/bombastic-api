@@ -6,13 +6,13 @@ import com.zwolsman.bombastic.domain.Tile
 interface BaseGameResponse {
     val id: String
     val tiles: List<Tile>
-    val stake: Int
-    val next: Int?
+    val stake: Long
+    val next: Long?
     val multiplier: Double
     val colorId: Int
     val state: Game.State
     val secret: String
     var bombs: Int
-    var initialBet: Int
+    var initialBet: Long
     val plain: String?
 }

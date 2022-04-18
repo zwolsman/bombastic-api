@@ -6,13 +6,12 @@ import org.springframework.data.relational.core.mapping.Table
 
 @Table("profiles")
 data class ProfileModel(
-    var points: Int,
+    var bits: Long,
     var name: String,
     var email: String,
     var gamesPlayed: Int,
-    var pointsEarned: Int,
-    var balanceInEur: Double,
-    var address: String?,
+    var bitsEarned: Long,
+    var address: String,
 
     @Id
     var id: Long? = null,
@@ -23,12 +22,11 @@ data class ProfileModel(
 
 fun ProfileModel(profile: Profile) =
     ProfileModel(
-        points = profile.points,
+        bits = profile.bits,
         name = profile.name,
         email = profile.email,
         gamesPlayed = profile.gamesPlayed,
-        pointsEarned = profile.pointsEarned,
-        balanceInEur = profile.balanceInEur,
+        bitsEarned = profile.bitsEarned,
         id = profile.id?.toLongOrNull(),
         appleUserId = profile.appleUserId,
         appleRefreshToken = profile.appleRefreshToken,

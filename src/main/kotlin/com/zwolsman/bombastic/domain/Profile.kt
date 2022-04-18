@@ -4,13 +4,12 @@ import com.zwolsman.bombastic.db.ProfileModel
 
 data class Profile(
     val id: String? = null,
-    val points: Int,
+    val bits: Long,
     val name: String,
     val email: String,
     val gamesPlayed: Int,
-    val pointsEarned: Int,
-    val balanceInEur: Double,
-    val address: String?,
+    val bitsEarned: Long,
+    val address: String,
 
     val appleUserId: String? = null,
     val appleRefreshToken: String? = null,
@@ -19,11 +18,10 @@ data class Profile(
 
 fun Profile(model: ProfileModel): Profile = Profile(
     id = model.id.toString(),
-    points = model.points,
+    bits = model.bits,
     name = model.name,
     email = model.email,
     gamesPlayed = model.gamesPlayed,
-    pointsEarned = model.pointsEarned,
-    balanceInEur = model.balanceInEur,
+    bitsEarned = model.bitsEarned,
     address = model.address,
 )
