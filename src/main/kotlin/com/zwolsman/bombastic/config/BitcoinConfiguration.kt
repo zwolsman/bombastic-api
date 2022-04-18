@@ -51,7 +51,6 @@ class BitcoinConfiguration(
         peerGroup.addWallet(wallet)
         peerGroup.start()
         peerGroup.downloadBlockChain()
-        log.info("Current balance: ${wallet.balance.toSat()} bits")
         log.info("Addresses that we know: ${wallet.issuedReceiveAddresses.map { it.hash }}")
         log.info("Address: ${wallet.freshReceiveAddress()}")
         return peerGroup

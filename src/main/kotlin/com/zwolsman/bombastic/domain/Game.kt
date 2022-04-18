@@ -32,7 +32,7 @@ data class Game(
     val secret: String,
     val isDeleted: Boolean,
 ) {
-    val stake = initialBet + tiles.filterIsInstance<Points>().sumOf { it.amount }
+    val stake = initialBet + tiles.filterIsInstance<Reveal>().sumOf { it.bits }
     val next = GameLogic.calculateNext(this)
     val bombs: List<Int>
         get() = secret.split("-").dropLast(1).map(String::toInt)

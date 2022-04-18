@@ -2,7 +2,7 @@ package com.zwolsman.bombastic.logic
 
 import com.zwolsman.bombastic.domain.Bomb
 import com.zwolsman.bombastic.domain.Game
-import com.zwolsman.bombastic.domain.Points
+import com.zwolsman.bombastic.domain.Reveal
 import com.zwolsman.bombastic.domain.Tile
 import com.zwolsman.bombastic.helpers.validate
 import java.security.SecureRandom
@@ -11,14 +11,14 @@ import kotlin.math.floor
 object GameLogic {
     private val rng = SecureRandom()
     private val tileRange = 1..25
-    const val houseEdge = 0.005
+    private const val houseEdge = 0.005
     private val allowedBombAmounts = listOf(1, 3, 5, 24)
     private const val alphanumeric = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
     fun guess(game: Game, tileId: Int): Game {
         validate(game.state == Game.State.IN_GAME) { IllegalStateException("Game is already finished") }
         validate(tileId in tileRange) { IllegalArgumentException("Tile should be in the game") }
-        validate(tileId !in game.tiles.map(Tile::id)) { IllegalArgumentException("Tile is already guessed") }
+        validate(tileId !in game.tiles.map(Tile::id)) { IllegalArgumentException("Tile is already revealed") }
 
         val didHitBomb = tileId in game.bombs
         if (didHitBomb) {
@@ -29,14 +29,14 @@ object GameLogic {
         }
 
         validate(game.next != null) { IllegalStateException("Could not calculate next") }
-        val points = Points(tileId, game.next)
+        val reveal = Reveal(tileId, game.next)
 
         if (game.tiles.size + game.bombs.size + 1 == tileRange.count()) {
-            return cashOut(game.copy(tiles = game.tiles + points))
+            return cashOut(game.copy(tiles = game.tiles + reveal))
         }
 
         return game.copy(
-            tiles = game.tiles + points
+            tiles = game.tiles + reveal
         )
     }
 
@@ -57,9 +57,9 @@ object GameLogic {
 
     fun calculateNext(game: Game): Long? {
         val tiles = tileRange.count().toDouble()
-        val guessedTiles = game.tiles.filterIsInstance<Points>().size
+        val revealedTiles = game.tiles.filterIsInstance<Reveal>().size
         val bombs = game.bombs.size
-        val tilesLeft = tiles - guessedTiles
+        val tilesLeft = tiles - revealedTiles
 
         var multiplier = tilesLeft / (tilesLeft - bombs)
         multiplier *= 1 - houseEdge

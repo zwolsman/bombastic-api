@@ -1,7 +1,7 @@
 package com.zwolsman.bombastic.domain.converters
 
 import com.zwolsman.bombastic.domain.Bomb
-import com.zwolsman.bombastic.domain.Points
+import com.zwolsman.bombastic.domain.Reveal
 import com.zwolsman.bombastic.domain.Tile
 import org.springframework.core.convert.converter.Converter
 import org.springframework.data.convert.WritingConverter
@@ -16,7 +16,7 @@ object TileWritingConverter : Converter<Tile, String> {
             } else {
                 "BF"
             }
-            is Points -> "P${source.amount}"
+            is Reveal -> "P${source.bits}"
         }
         return "$paddedId$value"
     }

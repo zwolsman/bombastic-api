@@ -2,7 +2,7 @@ package com.zwolsman.bombastic.logic
 
 import com.zwolsman.bombastic.domain.Bomb
 import com.zwolsman.bombastic.domain.Game
-import com.zwolsman.bombastic.domain.Points
+import com.zwolsman.bombastic.domain.Reveal
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -43,7 +43,7 @@ internal class GameLogicTest {
 
         assert(result.state == Game.State.IN_GAME)
         assert(result.next != null)
-        assert(tile is Points)
+        assert(tile is Reveal)
     }
 
     @Test
