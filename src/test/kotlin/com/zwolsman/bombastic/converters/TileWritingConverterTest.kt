@@ -1,7 +1,7 @@
 package com.zwolsman.bombastic.converters
 
 import com.zwolsman.bombastic.domain.Bomb
-import com.zwolsman.bombastic.domain.Points
+import com.zwolsman.bombastic.domain.Reveal
 import com.zwolsman.bombastic.domain.converters.TileWritingConverter
 import org.junit.jupiter.api.Test
 
@@ -18,7 +18,7 @@ internal class TileWritingConverterTest {
 
     @Test
     fun writePoints() {
-        val input = listOf(Points(1, 100), Points(16, 1337823))
+        val input = listOf(Reveal(1, 100), Reveal(16, 1337823))
         val expected = listOf("01P100", "16P1337823")
         for ((case, target) in input.zip(expected)) {
             val result = TileWritingConverter.convert(case)

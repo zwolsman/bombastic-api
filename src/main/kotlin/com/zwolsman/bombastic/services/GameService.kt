@@ -14,8 +14,8 @@ class GameService(private val profileService: ProfileService, private val gameRe
 
     @Transactional
     suspend fun create(profile: Profile, initialBet: Long, amountOfBombs: Int, colorId: Int): Pair<Game, Profile> {
-        validate(initialBet >= 100) { IllegalArgumentException("Minimum initial bet is 100 points") }
-        validate(initialBet <= profile.bits) { IllegalArgumentException("Not enough points") }
+        validate(initialBet >= 100) { IllegalArgumentException("Minimum initial bet is 100 bits") }
+        validate(initialBet <= profile.bits) { IllegalArgumentException("Not enough bits") }
         validate(profile.id != null) { IllegalStateException("No ID for profile") }
 
         val newGame = Game(
