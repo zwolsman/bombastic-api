@@ -6,10 +6,14 @@ import com.zwolsman.bombastic.domain.PointOffer
 import com.zwolsman.bombastic.domain.Profile
 import com.zwolsman.bombastic.helpers.validate
 import com.zwolsman.bombastic.repositories.ProfileRepository
+import org.bitcoinj.wallet.Wallet
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class ProfileService(private val repo: ProfileRepository) {
+class ProfileService(private val repo: ProfileRepository, private val wallet: Wallet) {
+    private val log = LoggerFactory.getLogger(javaClass)
+
     suspend fun createAppleUser(
         name: String,
         email: String,
@@ -29,6 +33,7 @@ class ProfileService(private val repo: ProfileRepository) {
                 appleRefreshToken = appleRefreshToken,
                 appleAccessToken = appleAccessToken,
                 balanceInEur = 0.0,
+                address = wallet.freshReceiveAddress().toString(),
             )
             else -> appleUserProfile.copy(
                 name = name,
@@ -97,4 +102,17 @@ class ProfileService(private val repo: ProfileRepository) {
             balanceInEur = balanceInEur - offer.price,
             points = points + offer.reward.toInt(),
         )
+
+    suspend fun addBits(address: String, bits: Long) {
+        val profile = repo.findByAddress(address) ?: run {
+            log.warn("No profile found associated with $address")
+            return
+        }
+
+        val amount = bits.toInt() // TODO fix this
+        log.info("Redeemed $bits bits for profile id ${profile.id} (${profile.name})")
+        val updatedProfile = profile.copy(points = profile.points + amount)
+
+        repo.save(updatedProfile)
+    }
 }

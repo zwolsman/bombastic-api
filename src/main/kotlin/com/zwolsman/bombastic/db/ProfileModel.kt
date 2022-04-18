@@ -12,6 +12,7 @@ data class ProfileModel(
     var gamesPlayed: Int,
     var pointsEarned: Int,
     var balanceInEur: Double,
+    var address: String?,
 
     @Id
     var id: Long? = null,
@@ -32,4 +33,5 @@ fun ProfileModel(profile: Profile) =
         appleUserId = profile.appleUserId,
         appleRefreshToken = profile.appleRefreshToken,
         appleAccessToken = profile.appleAccessToken,
+        address = profile.address,
     )
