@@ -2,6 +2,11 @@ logging.level.reactor.netty.http.server.AccessLog: INFO
 apple.certificatePath: infra/kubernetes/certificates/certs/apple.p8
 jwks.certificateDirectory: infra/kubernetes/certificates/certs/jwks
 
+btc:
+  ppid: regtest
+  wallet.watchKey:
+    data: tpubD8ym3X8H5E1ppuh88XtVd9aCa3w5NE4bwgRWrcpZFsnCTjigquqiREFo2ZeWFP8QkAy8ULAywpccdyw5nGGFmaYaRN9eB2c9qwaaY26Jhp2
+
 spring:
   r2dbc:
     url: r2dbc:postgresql://localhost/postgres

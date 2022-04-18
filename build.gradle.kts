@@ -38,6 +38,7 @@ dependencies {
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
     implementation("name.nkonev.r2dbc-migrate:r2dbc-migrate-spring-boot-starter:1.8.0")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
+    implementation("org.bitcoinj:bitcoinj-core:0.16.1")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("io.micrometer:micrometer-registry-prometheus")
