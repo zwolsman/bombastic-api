@@ -36,7 +36,7 @@ dependencies {
     implementation("org.zalando:problem-spring-webflux:0.28.0-RC.0")
     implementation("org.bitbucket.b_c:jose4j:0.7.11")
     implementation("org.bouncycastle:bcpkix-jdk15on:1.70")
-    implementation("name.nkonev.r2dbc-migrate:r2dbc-migrate-spring-boot-starter:1.8.0")
+    implementation("name.nkonev.r2dbc-migrate:r2dbc-migrate-spring-boot-starter:1.8.5")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
     implementation("org.bitcoinj:bitcoinj-core:0.16.1")
     runtimeOnly("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
