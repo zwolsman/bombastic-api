@@ -2,6 +2,8 @@ spring:
   r2dbc:
     url: r2dbc:postgresql://db-postgres.joell.dev/bombastic
     username: bombastic
+  jackson:
+    date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
 
 apple:
   keyId: REPLACE_ME
