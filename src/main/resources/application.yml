@@ -5,6 +5,11 @@ spring:
   jackson:
     date-format: com.fasterxml.jackson.databind.util.ISO8601DateFormat
 
+btc:
+  ppid: test
+  wallet.watchKey:
+    data: vpub5UJL5nZ5JKp4qM2RsZXwQ4EpTzXPPzPcbKuKFw6yodP3cvSFa5WG57VmygCSGuFGVsB948p3b3EQuEUKFw8PEGaJnWYhSeaqUM3ApLJkHou
+
 apple:
   keyId: REPLACE_ME
   teamId: REPLACE_ME
