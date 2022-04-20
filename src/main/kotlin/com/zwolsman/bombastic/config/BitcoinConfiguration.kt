@@ -27,15 +27,8 @@ class BitcoinConfiguration(
     fun networkParameters(): NetworkParameters =
         NetworkParameters.fromPmtProtocolID(paymentProtocolId) ?: error("Unrecognized payment protocol id")
 
-    @Bean // TODO: make this configurable
-    fun blockStore(params: NetworkParameters) = PostgresFullPrunedBlockStore(
-        params,
-        1000,
-        "localhost",
-        "postgres",
-        "postgres",
-        "password",
-    )
+    @Bean
+    fun blockStore(params: NetworkParameters) = SPVBlockStore(params, File("block-store-${params.paymentProtocolId}.dat"))
 
     @Bean
     fun wallet(params: NetworkParameters, utxoProvider: UTXOProvider): Wallet {
