@@ -5,6 +5,7 @@ import com.zwolsman.bombastic.controllers.profile.responses.TransactionResponse
 import com.zwolsman.bombastic.controllers.profile.responses.TransactionType
 import com.zwolsman.bombastic.controllers.profile.responses.TransactionsResponse
 import com.zwolsman.bombastic.domain.Profile
+import com.zwolsman.bombastic.helpers.toBits
 import com.zwolsman.bombastic.services.ProfileService
 import com.zwolsman.bombastic.services.TransactionService
 import org.bitcoinj.core.NetworkParameters
@@ -37,7 +38,7 @@ class ProfileController(
                 output.scriptPubKey.getToAddress(params).toString() == profile.address
             }
                 .map { output ->
-                    val amount = output.value.toSat()
+                    val amount = output.value.toBits()
                     TransactionResponse(
                         txId = tx.txId.toString(),
                         type = TransactionType.DEPOSIT,

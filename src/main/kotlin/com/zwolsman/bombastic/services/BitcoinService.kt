@@ -36,7 +36,7 @@ class BitcoinService(
         log.info("Confirmed deposit. txid: ${tx.txId}")
         for (output in tx.getWalletOutputs(wallet)) {
             val toAddress = output.scriptPubKey.getToAddress(tx.params)
-            val amount = output.value.toSat()
+            val amount = output.value.toBits()
             log.info("Received $amount bits on $toAddress")
 
             CoroutineScope(executor.asCoroutineDispatcher()).launch {
