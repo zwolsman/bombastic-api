@@ -1,5 +1,6 @@
 package com.zwolsman.bombastic.services
 
+import com.zwolsman.bombastic.helpers.toBits
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
@@ -7,6 +8,7 @@ import org.bitcoinj.core.Coin
 import org.bitcoinj.core.Transaction
 import org.bitcoinj.wallet.Wallet
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.DisposableBean
 import org.springframework.stereotype.Service
 import java.util.concurrent.Executor
 
@@ -15,7 +17,7 @@ class BitcoinService(
     private val executor: Executor,
     private val wallet: Wallet,
     private val profileService: ProfileService,
-) {
+) : DisposableBean {
     private val log = LoggerFactory.getLogger(javaClass)
 
     init {
@@ -41,5 +43,9 @@ class BitcoinService(
                 profileService.addBits(toAddress.toString(), amount)
             }
         }
+    }
+
+    override fun destroy() {
+        wallet.shutdownAutosaveAndWait()
     }
 }
