@@ -4,8 +4,12 @@ jwks.certificateDirectory: infra/kubernetes/certificates/certs/jwks
 
 btc:
   ppid: regtest
-  wallet.watchKey:
-    data: tpubD8ym3X8H5E1ppuh88XtVd9aCa3w5NE4bwgRWrcpZFsnCTjigquqiREFo2ZeWFP8QkAy8ULAywpccdyw5nGGFmaYaRN9eB2c9qwaaY26Jhp2
+  blockStore:
+    type: SPVBlockStore
+    file: data/test-block-store.bin
+  wallet:
+    file: data/test-wallet.bin
+    watchKey: tpubD8ym3X8H5E1ppuh88XtVd9aCa3w5NE4bwgRWrcpZFsnCTjigquqiREFo2ZeWFP8QkAy8ULAywpccdyw5nGGFmaYaRN9eB2c9qwaaY26Jhp2
 
 spring:
   r2dbc:
