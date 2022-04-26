@@ -7,8 +7,12 @@ spring:
 
 btc:
   ppid: test
-  wallet.watchKey:
-    data: vpub5UJL5nZ5JKp4qM2RsZXwQ4EpTzXPPzPcbKuKFw6yodP3cvSFa5WG57VmygCSGuFGVsB948p3b3EQuEUKFw8PEGaJnWYhSeaqUM3ApLJkHou
+  blockStore:
+    type: SPVBlockStore
+    file: data/test-block-store.bin
+  wallet:
+    file: data/bombastic-wallet-m0.bin
+    watchKey: vpub5UJL5nZ5JKp4qM2RsZXwQ4EpTzXPPzPcbKuKFw6yodP3cvSFa5WG57VmygCSGuFGVsB948p3b3EQuEUKFw8PEGaJnWYhSeaqUM3ApLJkHou
 
 apple:
   keyId: REPLACE_ME
