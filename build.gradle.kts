@@ -59,3 +59,14 @@ tasks.withType<KotlinCompile> {
 tasks.withType<Test> {
     useJUnitPlatform()
 }
+
+jib {
+    extraDirectories {
+        paths {
+            path {
+                setFrom("data")
+                into = "/app/data/"
+            }
+        }
+    }
+}
