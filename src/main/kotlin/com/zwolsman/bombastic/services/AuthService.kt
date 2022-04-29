@@ -72,8 +72,6 @@ class AuthService(
         claims.setIssuedAtToNow()
         claims.subject = profile.id
 
-        claims.setClaim("email", profile.email)
-
         val (keyId, key) = keys.random()
         val jws = JsonWebSignature()
         jws.payload = claims.toJson()
@@ -84,12 +82,11 @@ class AuthService(
         return jws.compactSerialization
     }
 
-    suspend fun signUp(email: String, fullName: String, authCode: String, identityToken: String): String {
+    suspend fun signUp(fullName: String, authCode: String, identityToken: String): String {
         val appleTokens = appleIdService.verify(identityToken, authCode)
         val appleUserId = appleIdService.userId(appleTokens.idToken)
         val profile = profileService.createAppleUser(
             fullName,
-            email,
             appleUserId,
             appleTokens.refreshToken,
             appleTokens.accessToken

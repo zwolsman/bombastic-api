@@ -19,7 +19,7 @@ class AuthController(private val authService: AuthService) {
     @PostMapping("/sign-up")
     suspend fun signUp(@RequestBody payload: SignUpPayload): AuthResponse =
         authService
-            .signUp(payload.email, payload.fullName, payload.authCode, payload.identityToken)
+            .signUp(payload.fullName, payload.authCode, payload.identityToken)
             .let(::AuthResponse)
 
     @PostMapping("/verify")
