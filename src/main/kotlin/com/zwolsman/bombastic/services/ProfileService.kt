@@ -13,7 +13,6 @@ class ProfileService(private val repo: ProfileRepository, private val wallet: Wa
 
     suspend fun createAppleUser(
         name: String,
-        email: String,
         appleUserId: String,
         appleRefreshToken: String,
         appleAccessToken: String
@@ -23,7 +22,6 @@ class ProfileService(private val repo: ProfileRepository, private val wallet: Wa
                 id = null,
                 bits = 0,
                 name = name,
-                email = email,
                 gamesPlayed = 0,
                 bitsEarned = 0,
                 appleUserId = appleUserId,
@@ -33,7 +31,6 @@ class ProfileService(private val repo: ProfileRepository, private val wallet: Wa
             )
             else -> appleUserProfile.copy(
                 name = name,
-                email = email,
                 appleRefreshToken = appleRefreshToken,
                 appleAccessToken = appleAccessToken,
             )

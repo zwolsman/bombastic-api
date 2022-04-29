@@ -8,7 +8,6 @@ import org.springframework.data.relational.core.mapping.Table
 data class ProfileModel(
     var bits: Long,
     var name: String,
-    var email: String,
     var gamesPlayed: Int,
     var bitsEarned: Long,
     var address: String,
@@ -24,7 +23,6 @@ fun ProfileModel(profile: Profile) =
     ProfileModel(
         bits = profile.bits,
         name = profile.name,
-        email = profile.email,
         gamesPlayed = profile.gamesPlayed,
         bitsEarned = profile.bitsEarned,
         id = profile.id?.toLongOrNull(),
