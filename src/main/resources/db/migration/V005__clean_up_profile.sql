@@ -1,8 +1,8 @@
-ALTER TABLE postgres.public.profiles
+ALTER TABLE profiles
     RENAME COLUMN points TO bits;
 
-ALTER TABLE postgres.public.profiles
+ALTER TABLE profiles
     RENAME COLUMN points_earned TO bits_earned;
 
-ALTER TABLE postgres.public.profiles
+ALTER TABLE profiles
     DROP COLUMN balance_in_eur;
