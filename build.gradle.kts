@@ -66,6 +66,10 @@ jib {
             path {
                 setFrom("data")
                 into = "/app/data/"
+                permissions = mapOf(
+                    "/app/data/" to "666",
+                    "/app/data/**" to "666",
+                )
             }
         }
     }
