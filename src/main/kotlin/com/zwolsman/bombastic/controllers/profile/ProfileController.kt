@@ -30,7 +30,6 @@ class ProfileController(
 
     @GetMapping("/me/transactions")
     suspend fun userProfile(@AuthenticationPrincipal profile: Profile, unused: Int? = null): TransactionsResponse {
-        requireNotNull(profile.address)
         val transactions = transactionService.findTransactions(profile)
 
         // TODO: create response mapper

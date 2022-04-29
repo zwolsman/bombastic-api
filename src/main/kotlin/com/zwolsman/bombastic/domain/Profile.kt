@@ -9,7 +9,7 @@ data class Profile(
     val email: String,
     val gamesPlayed: Int,
     val bitsEarned: Long,
-    val address: String?,
+    val address: String,
 
     val appleUserId: String? = null,
     val appleRefreshToken: String? = null,
