@@ -2,6 +2,8 @@ package com.zwolsman.bombastic.repositories
 
 import com.zwolsman.bombastic.db.ProfileModel
 import com.zwolsman.bombastic.domain.Profile
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.asFlow
 import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
@@ -41,4 +43,11 @@ class ProfileRepository(private val db: ProfileDatabaseRepository) {
             .let(db::save)
             .awaitFirst()
             .let(::Profile)
+
+    suspend fun findAll(): List<Profile> =
+        db
+            .findAll()
+            .map(::Profile)
+            .asFlow()
+            .toList()
 }

@@ -11,11 +11,15 @@ data class ProfileResponse(
     val address: String,
 )
 
-fun ProfileResponse(profile: Profile) = ProfileResponse(
-    profile.name,
-    profile.bits,
-    profile.gamesPlayed,
-    profile.bitsEarned,
-    "https://bombastic.io/u/${profile.id}",
-    profile.address,
-)
+fun ProfileResponse(profile: Profile) : ProfileResponse{
+    requireNotNull(profile.address)
+
+    return ProfileResponse(
+        profile.name,
+        profile.bits,
+        profile.gamesPlayed,
+        profile.bitsEarned,
+        "https://bombastic.io/u/${profile.id}",
+        profile.address,
+    )
+}

@@ -11,7 +11,7 @@ data class ProfileModel(
     var email: String,
     var gamesPlayed: Int,
     var bitsEarned: Long,
-    var address: String,
+    var address: String?,
 
     @Id
     var id: Long? = null,
