@@ -24,4 +24,8 @@ fun Profile(model: ProfileModel): Profile = Profile(
     gamesPlayed = model.gamesPlayed,
     bitsEarned = model.bitsEarned,
     address = model.address,
+
+    appleUserId = model.appleUserId,
+    appleRefreshToken = model.appleRefreshToken,
+    appleAccessToken = model.appleAccessToken,
 )
