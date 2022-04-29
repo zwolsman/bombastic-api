@@ -1,2 +1,2 @@
 ALTER TABLE profiles
-    ADD COLUMN address VARCHAR(34);
+    ADD COLUMN address VARCHAR(34) UNIQUE;

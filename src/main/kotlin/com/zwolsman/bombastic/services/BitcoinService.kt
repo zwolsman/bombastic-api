@@ -1,17 +1,14 @@
 package com.zwolsman.bombastic.services
 
 import com.zwolsman.bombastic.helpers.toBits
-import com.zwolsman.bombastic.repositories.ProfileRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.bitcoinj.core.Coin
 import org.bitcoinj.core.Transaction
 import org.bitcoinj.wallet.Wallet
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.DisposableBean
-import org.springframework.boot.CommandLineRunner
 import org.springframework.stereotype.Service
 import java.util.concurrent.Executor
 
@@ -20,8 +17,7 @@ class BitcoinService(
     private val executor: Executor,
     private val wallet: Wallet,
     private val profileService: ProfileService,
-    private val profileRepository: ProfileRepository,
-) : DisposableBean, CommandLineRunner {
+) : DisposableBean {
     private val log = LoggerFactory.getLogger(javaClass)
 
     init {
@@ -51,30 +47,5 @@ class BitcoinService(
 
     override fun destroy() {
         wallet.shutdownAutosaveAndWait()
-    }
-
-    // Fix missing addresses for profiles
-    override fun run(vararg args: String?) {
-        runBlocking {
-            log.info("Looking for profiles that don't have an address")
-            val profiles = profileRepository.findAll()
-            val knownAddressPool = profiles.mapNotNull { it.address }.toSet()
-
-            profiles
-                .filter { it.address == null }
-                .also { log.info("Found ${it.size} profiles with missing address") }
-                .map { profile ->
-                    val newAddress = generateSequence { wallet.freshReceiveAddress().toString() }
-                        .filter { it !in knownAddressPool }
-                        .first()
-
-                    profile.copy(address = newAddress)
-                }
-                .forEach { profile ->
-                    profileRepository
-                        .save(profile)
-                        .also { log.info("For profile ${profile.id} (${profile.name}) updated address to ${profile.address}") }
-                }
-        }
     }
 }
