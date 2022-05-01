@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.core.Ordered
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpMethod
-import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.annotation.method.configuration.EnableReactiveMethodSecurity
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity
@@ -48,6 +47,7 @@ class SecurityConfig(
                 "/api/v1/auth/sign-up",
                 "/api/v1/auth/verify",
                 "/api/v1/auth/keys",
+                "/api/v1/profiles/{id:[0-9]+}",
                 "/api/swagger-*/**",
                 "/v3/api-docs"
             ).permitAll()

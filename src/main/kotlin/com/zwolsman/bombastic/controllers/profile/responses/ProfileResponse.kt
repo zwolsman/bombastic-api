@@ -8,14 +8,14 @@ data class ProfileResponse(
     val games: Int,
     val bitsEarned: Long,
     val link: String,
-    val address: String,
+    val address: String?,
 )
 
-fun ProfileResponse(profile: Profile) = ProfileResponse(
+fun ProfileResponse(profile: Profile, exposeAddress: Boolean = true) = ProfileResponse(
     profile.name,
     profile.bits,
     profile.gamesPlayed,
     profile.bitsEarned,
-    "https://bombastic.io/u/${profile.id}",
-    profile.address,
+    "https://bombastic.joell.dev/api/v1/profiles/${profile.id}",
+    profile.address.takeIf { exposeAddress },
 )

@@ -59,5 +59,5 @@ class ProfileController(
     suspend fun byId(@PathVariable id: String): ProfileResponse =
         profileService
             .findById(id)
-            .let(::ProfileResponse)
+            .let { ProfileResponse(it, exposeAddress = false) }
 }
