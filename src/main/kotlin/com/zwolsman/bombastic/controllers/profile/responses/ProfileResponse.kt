@@ -1,7 +1,9 @@
 package com.zwolsman.bombastic.controllers.profile.responses
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.zwolsman.bombastic.domain.Profile
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 data class ProfileResponse(
     val name: String,
     val bits: Long,
